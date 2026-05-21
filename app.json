@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "virtual-journal",
-    "slug": "virtual-journal",
+    "name": "echo",
+    "slug": "echo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "virtualjournal",
+    "scheme": "echo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gauthamprasad.virtualjournal"
+      "package": "com.gauthamprasad.echo"
     },
     "web": {
       "output": "static",
