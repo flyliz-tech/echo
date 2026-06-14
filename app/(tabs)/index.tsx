@@ -12,7 +12,7 @@ import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
   const sortMode = useTaskStore((s) => s.sortMode);
   const setSortMode = useTaskStore((s) => s.setSortMode);
@@ -27,7 +27,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["top", "bottom"]}
+      edges={isDark ? ["top", "bottom"] : ["bottom"]}
     >
       <View style={styles.topBar}>
         <Text style={[styles.title, { color: colors.text }]}>

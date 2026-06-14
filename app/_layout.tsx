@@ -1,8 +1,9 @@
 import { Stack, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Platform, StatusBar as RNStatusBar, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import "@/lib/services/geofencing";
 import { DeleteUndoToast } from "@/components/DeleteUndoToast";
@@ -10,14 +11,23 @@ import { useTheme } from "@/hooks/useTheme";
 import { setupNotificationResponseHandler } from "@/lib/services/notifications";
 import { useTaskStore } from "@/lib/store/taskStore";
 
-export default function RootLayout() {
+const LIGHT_STATUS_BAR_BG = "#000000";
+
+function RootLayoutContent() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   const initialize = useTaskStore((s) => s.initialize);
   const isInitialized = useTaskStore((s) => s.isInitialized);
   const isLoading = useTaskStore((s) => s.isLoading);
   const pendingDelete = useTaskStore((s) => s.pendingDelete);
   const undoDelete = useTaskStore((s) => s.undoDelete);
+
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    RNStatusBar.setBarStyle("light-content");
+    RNStatusBar.setBackgroundColor(isDark ? colors.background : LIGHT_STATUS_BAR_BG);
+  }, [isDark, colors.background]);
 
   useEffect(() => {
     initialize();
@@ -45,8 +55,17 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style="light" />
+      {!isDark && insets.top > 0 && (
+        <View
+          style={{
+            height: insets.top,
+            backgroundColor: LIGHT_STATUS_BAR_BG,
+          }}
+        />
+      )}
+      <View style={{ flex: 1 }}>
         <Stack
           screenOptions={{
             headerStyle: { backgroundColor: colors.surface },
@@ -69,6 +88,16 @@ export default function RootLayout() {
             onUndo={undoDelete}
           />
         )}
+      </View>
+    </View>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <RootLayoutContent />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
