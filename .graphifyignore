@@ -1,0 +1,10 @@
+node_modules/
+android/
+.expo/
+.git/
+graphify-out/
+Docs/
+*.apk
+*.aab
+build/
+dist/
