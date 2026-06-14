@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import { Tabs, useRouter } from "expo-router";
 import { Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -44,7 +44,7 @@ export default function TabLayout() {
           headerShown: false,
           title: "Echo",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="home-outline" size={TAB_ICON_SIZE} color={color} />
+            <Entypo name="home" size={TAB_ICON_SIZE} color={color} />
           ),
         }}
       />
