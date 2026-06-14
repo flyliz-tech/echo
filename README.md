@@ -1,50 +1,78 @@
-# Welcome to your Expo app 👋
+# Echo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A contextual spatial task manager built with Expo. Tasks echo back when you're in the right place or at the right time.
 
-## Get started
+## Features (MVP)
 
-1. Install dependencies
+- Offline-first task storage with SQLite
+- Home list with sort modes, search, and quick-complete
+- Create / view / edit / delete tasks with 10-second undo
+- Full-screen map with location-task pins
+- Calendar view for time-triggered tasks
+- Android geofencing and local notifications
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Get Started
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env
+# Add your Google Maps API key to .env
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+For Android native features (maps, geofencing, notifications):
 
-## Learn more
+```bash
+export GOOGLE_MAPS_API_KEY=your_key_here
+npm run android:prebuild
+npm run android
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Google Maps API Key (Android)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. Create a project in [Google Cloud Console](https://console.cloud.google.com/)
+2. Enable **Maps SDK for Android**
+3. Create an API key restricted to your app's package name (`com.gauthamprasad.echo`)
+4. Set `GOOGLE_MAPS_API_KEY` in `.env` or export it before prebuild:
 
-## Join the community
+```bash
+export GOOGLE_MAPS_API_KEY=your_android_maps_api_key
+npx expo prebuild --platform android
+```
 
-Join our community of developers creating universal apps.
+The key is injected via [`app.config.js`](app.config.js) into the Android manifest at prebuild time. Do not commit API keys.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Android Permissions
+
+Echo requests:
+
+- **Foreground location** — map pin picker and map view
+- **Background location** — geofence triggers when the app is closed
+- **Notifications** — time and location reminders
+
+Test geofencing on a **physical Android device**; emulators are unreliable for region events.
+
+## Build Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start Expo dev server |
+| `npm run android` | Run on Android device/emulator |
+| `npm run android:prebuild` | Regenerate native Android project |
+| `npm run android:prod` | Build release APK |
+| `npm run android:dev:install` | Install debug APK via adb |
+| `npm run android:prod:install` | Install release APK via adb |
+
+## Architecture
+
+- **UI**: Expo Router, React Native
+- **State**: Zustand ([`lib/store/taskStore.ts`](lib/store/taskStore.ts))
+- **Database**: expo-sqlite ([`lib/db/`](lib/db/))
+- **Geofencing**: expo-location + expo-task-manager ([`lib/services/geofencing.ts`](lib/services/geofencing.ts))
+- **Notifications**: expo-notifications ([`lib/services/notifications.ts`](lib/services/notifications.ts))
+
+## Deferred (Phase 2+)
+
+- Supabase auth and cloud sync
+- OTA updates via hot-updater
+- V3 premium features (custom audio, notification stacking, voice calls)

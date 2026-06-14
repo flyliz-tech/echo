@@ -39,7 +39,26 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Echo uses your location to remind you about tasks when you arrive at a place.",
+          "locationAlwaysPermission": "Echo uses background location to trigger task reminders when you enter a saved place.",
+          "locationWhenInUsePermission": "Echo uses your location to set task triggers and show tasks on the map.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#2563EB"
+        }
+      ],
+      "expo-sqlite",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
