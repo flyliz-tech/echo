@@ -47,44 +47,59 @@ function taskToRegion(task: Task): Location.LocationRegion | null {
   };
 }
 
+function warnGeofencingUnavailable(reason: string): void {
+  if (__DEV__) {
+    console.warn(
+      `${reason} Geofencing unavailable (Expo Go on Android does not support background location).`
+    );
+  }
+}
+
 export async function syncGeofences(): Promise<void> {
+  try {
+    const { status: foregroundStatus } =
+      await Location.requestForegroundPermissionsAsync();
+    if (foregroundStatus !== "granted") return;
 
-  const { status: foregroundStatus } =
-    await Location.requestForegroundPermissionsAsync();
-  if (foregroundStatus !== "granted") return;
+    const tasks = await getAllTasks();
+    const regions = tasks
+      .map(taskToRegion)
+      .filter((r): r is Location.LocationRegion => r != null)
+      .slice(0, MAX_GEOFENCES);
 
-  const tasks = await getAllTasks();
-  const regions = tasks
-    .map(taskToRegion)
-    .filter((r): r is Location.LocationRegion => r != null)
-    .slice(0, MAX_GEOFENCES);
+    let { status: backgroundStatus } =
+      await Location.getBackgroundPermissionsAsync();
+    if (backgroundStatus !== "granted") {
+      ({ status: backgroundStatus } =
+        await Location.requestBackgroundPermissionsAsync());
+    }
 
-  const isRunning = await Location.hasStartedGeofencingAsync(
-    GEOFENCE_TASK_NAME
-  );
+    if (backgroundStatus !== "granted") {
+      warnGeofencingUnavailable("Background location not granted;");
+      return;
+    }
 
-  if (regions.length === 0) {
+    const isRunning = await Location.hasStartedGeofencingAsync(
+      GEOFENCE_TASK_NAME
+    );
+
+    if (regions.length === 0) {
+      if (isRunning) {
+        await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
+      }
+      return;
+    }
+
     if (isRunning) {
       await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
     }
-    return;
+
+    await Location.startGeofencingAsync(GEOFENCE_TASK_NAME, regions);
+  } catch (error) {
+    warnGeofencingUnavailable(
+      `Geofencing API rejected: ${error instanceof Error ? error.message : String(error)};`
+    );
   }
-
-  const { status: backgroundStatus } =
-    await Location.requestBackgroundPermissionsAsync();
-
-  if (backgroundStatus !== "granted") {
-    if (__DEV__) {
-      console.warn("Background location not granted; geofencing limited");
-    }
-    return;
-  }
-
-  if (isRunning) {
-    await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
-  }
-
-  await Location.startGeofencingAsync(GEOFENCE_TASK_NAME, regions);
 }
 
 export async function requestLocationPermissions(): Promise<{

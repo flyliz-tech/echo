@@ -56,6 +56,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="settings"
+            options={{ title: "Settings", headerBackTitle: "Back" }}
+          />
           <Stack.Screen name="task/[id]" options={{ headerShown: false }} />
         </Stack>
 

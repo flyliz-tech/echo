@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, useRouter } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
@@ -20,10 +20,13 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 64 + insets.bottom,
-          paddingBottom: spacing.sm + insets.bottom,
-          paddingTop: spacing.xs,
-          marginBottom: spacing.md,
+          height: 56 + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: spacing.sm,
+        },
+        tabBarItemStyle: {
+          justifyContent: "center",
+          alignItems: "center",
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabInactive,
@@ -32,9 +35,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           title: "Echo",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="home-outline" size={24} color={color} />
           ),
         }}
       />
@@ -42,8 +46,8 @@ export default function TabLayout() {
         name="search"
         options={{
           title: "Search",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="search-outline" size={24} color={color} />
           ),
         }}
       />
@@ -51,8 +55,24 @@ export default function TabLayout() {
         name="create"
         options={{
           title: "Create Task",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="add-circle" size={36} color={color} />
+          tabBarIcon: () => (
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: colors.primary,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: colors.shadow,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 4,
+                elevation: 4,
+              }}
+            >
+              <Ionicons name="add" size={26} color="#FFFFFF" />
+            </View>
           ),
           tabBarLabel: () => null,
           headerLeft: () => (
@@ -70,8 +90,8 @@ export default function TabLayout() {
         name="map"
         options={{
           title: "Map",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="map-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="map-outline" size={24} color={color} />
           ),
         }}
       />
@@ -79,8 +99,8 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: "Calendar",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="calendar-outline" size={24} color={color} />
           ),
         }}
       />

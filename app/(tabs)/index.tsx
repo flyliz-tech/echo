@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,7 +12,6 @@ import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
   const sortMode = useTaskStore((s) => s.sortMode);
@@ -25,15 +24,24 @@ export default function HomeScreen() {
   const tasks = getFilteredTasks();
   const isSearching = searchFocused || searchQuery.length > 0;
 
-  useEffect(() => {
-    navigation.setOptions({ headerShown: !searchFocused });
-  }, [navigation, searchFocused]);
-
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={["bottom"]}
+      edges={["top", "bottom"]}
     >
+      <View style={styles.topBar}>
+        <Text style={[styles.title, { color: colors.text }]}>
+          {searchFocused ? "Search" : "Echo"}
+        </Text>
+        <Pressable
+          onPress={() => router.push("/settings")}
+          hitSlop={8}
+          accessibilityLabel="Settings"
+        >
+          <Ionicons name="settings-outline" size={24} color={colors.text} />
+        </Pressable>
+      </View>
+
       <View
         style={[
           styles.searchBar,
@@ -102,6 +110,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.md,
+  },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.sm,
+    minHeight: 44,
+  },
+  title: {
+    ...typography.title,
+    fontSize: 20,
   },
   searchBar: {
     flexDirection: "row",
