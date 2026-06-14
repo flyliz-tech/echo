@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -11,7 +12,9 @@ import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { colors } = useTheme();
+  const [searchFocused, setSearchFocused] = useState(false);
   const sortMode = useTaskStore((s) => s.sortMode);
   const setSortMode = useTaskStore((s) => s.setSortMode);
   const searchQuery = useTaskStore((s) => s.searchQuery);
@@ -20,41 +23,57 @@ export default function HomeScreen() {
   const toggleComplete = useTaskStore((s) => s.toggleComplete);
 
   const tasks = getFilteredTasks();
+  const isSearching = searchFocused || searchQuery.length > 0;
+
+  useEffect(() => {
+    navigation.setOptions({ headerShown: !searchFocused });
+  }, [navigation, searchFocused]);
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={["bottom"]}
     >
-      <View style={styles.headerActions}>
-        <Pressable onPress={() => router.push("/(tabs)/create")}>
-          <Ionicons name="add-circle-outline" size={28} color={colors.primary} />
-        </Pressable>
-        <Pressable onPress={() => router.push("/(tabs)/map")}>
-          <Ionicons name="map-outline" size={24} color={colors.text} />
-        </Pressable>
-        <Pressable onPress={() => router.push("/(tabs)/calendar")}>
-          <Ionicons name="calendar-outline" size={24} color={colors.text} />
-        </Pressable>
-      </View>
-
-      <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Ionicons name="search" size={18} color={colors.textSecondary} />
+      <View
+        style={[
+          styles.searchBar,
+          {
+            backgroundColor: colors.surface,
+            borderColor: isSearching ? colors.primary : colors.border,
+            borderWidth: isSearching ? 2 : 1,
+            paddingVertical: isSearching ? spacing.md : spacing.sm,
+          },
+        ]}
+      >
+        <Ionicons
+          name="search"
+          size={isSearching ? 20 : 18}
+          color={isSearching ? colors.primary : colors.textSecondary}
+        />
         <TextInput
           value={searchQuery}
           onChangeText={setSearchQuery}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
           placeholder="Search by task, location, notes"
           placeholderTextColor={colors.textSecondary}
           style={[styles.searchInput, { color: colors.text }]}
         />
         {searchQuery.length > 0 && (
           <Pressable onPress={() => setSearchQuery("")}>
-            <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
+            <Ionicons name="close" size={22} color={colors.textSecondary} />
           </Pressable>
         )}
       </View>
 
-      <TaskSortToggle value={sortMode} onChange={setSortMode} />
+      {!isSearching && (
+        <>
+          <Text style={[styles.sortLabel, { color: colors.textSecondary }]}>
+            Sort task
+          </Text>
+          <TaskSortToggle value={sortMode} onChange={setSortMode} />
+        </>
+      )}
 
       <FlatList
         data={tasks}
@@ -63,7 +82,7 @@ export default function HomeScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              No tasks yet. Tap + to create one.
+              {searchQuery ? "No matching tasks" : "No tasks yet. Tap + to create one."}
             </Text>
           </View>
         }
@@ -84,19 +103,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.md,
   },
-  headerActions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: spacing.md,
-    marginBottom: spacing.sm,
-  },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
@@ -104,6 +115,10 @@ const styles = StyleSheet.create({
     flex: 1,
     ...typography.body,
     fontSize: 15,
+  },
+  sortLabel: {
+    ...typography.caption,
+    marginBottom: spacing.xs,
   },
   list: {
     paddingBottom: spacing.lg,

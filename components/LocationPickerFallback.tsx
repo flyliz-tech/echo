@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
-import MapView, { Circle, Marker, Region } from "react-native-maps";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
 import { radius, spacing, typography } from "@/constants/theme";
+import { DEFAULT_CENTER } from "@/constants/map";
 import {
   DEFAULT_RADIUS_METERS,
   MAX_RADIUS_METERS,
   MIN_RADIUS_METERS,
 } from "@/lib/types/task";
-import { getCurrentLocation } from "@/lib/services/geofencing";
 
-interface LocationPickerProps {
+export interface LocationPickerProps {
   latitude: number | null;
   longitude: number | null;
   radiusMeters: number;
@@ -19,74 +18,43 @@ interface LocationPickerProps {
   onRadiusChange: (radius: number) => void;
 }
 
-const DEFAULT_REGION: Region = {
-  latitude: 13.0654,
-  longitude: 74.9982,
-  latitudeDelta: 0.02,
-  longitudeDelta: 0.02,
-};
-
-export function LocationPicker({
+export function LocationPickerFallback({
   latitude,
   longitude,
   radiusMeters,
   onLocationChange,
   onRadiusChange,
-}: LocationPickerProps) {
+  message = "Map picker requires a development build with MapLibre",
+}: LocationPickerProps & { message?: string }) {
   const { colors } = useTheme();
-  const [region, setRegion] = useState<Region>(() =>
-    latitude != null && longitude != null
-      ? { ...DEFAULT_REGION, latitude, longitude }
-      : DEFAULT_REGION
-  );
-
   const [hasInitializedLocation, setHasInitializedLocation] = useState(
     latitude != null && longitude != null
   );
 
+  const pinLat = latitude ?? DEFAULT_CENTER.latitude;
+  const pinLng = longitude ?? DEFAULT_CENTER.longitude;
+
   useEffect(() => {
     if (hasInitializedLocation) return;
-
-    getCurrentLocation().then((loc) => {
-      if (loc) {
-        setRegion((prev) => ({ ...prev, ...loc }));
-        onLocationChange(loc.latitude, loc.longitude);
-      } else {
-        onLocationChange(DEFAULT_REGION.latitude, DEFAULT_REGION.longitude);
-      }
-      setHasInitializedLocation(true);
-    });
+    onLocationChange(DEFAULT_CENTER.latitude, DEFAULT_CENTER.longitude);
+    setHasInitializedLocation(true);
   }, [hasInitializedLocation, onLocationChange]);
-
-  const pinLat = latitude ?? region.latitude;
-  const pinLng = longitude ?? region.longitude;
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        region={region}
-        onRegionChangeComplete={setRegion}
-        onPress={(e) => {
-          const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
-          onLocationChange(lat, lng);
-        }}
+      <View
+        style={[
+          styles.mapPlaceholder,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
       >
-        <Marker
-          coordinate={{ latitude: pinLat, longitude: pinLng }}
-          draggable
-          onDragEnd={(e) => {
-            const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
-            onLocationChange(lat, lng);
-          }}
-        />
-        <Circle
-          center={{ latitude: pinLat, longitude: pinLng }}
-          radius={radiusMeters}
-          fillColor="rgba(37, 99, 235, 0.15)"
-          strokeColor="rgba(37, 99, 235, 0.5)"
-        />
-      </MapView>
+        <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>
+          {message}
+        </Text>
+        <Text style={[styles.coords, { color: colors.text }]}>
+          {pinLat.toFixed(4)}, {pinLng.toFixed(4)}
+        </Text>
+      </View>
 
       <View style={[styles.radiusControl, { backgroundColor: colors.surface }]}>
         <Text style={[styles.radiusLabel, { color: colors.textSecondary }]}>
@@ -96,9 +64,7 @@ export function LocationPicker({
           <Text
             style={[styles.radiusButton, { color: colors.primary }]}
             onPress={() =>
-              onRadiusChange(
-                Math.max(MIN_RADIUS_METERS, radiusMeters - 25)
-              )
+              onRadiusChange(Math.max(MIN_RADIUS_METERS, radiusMeters - 25))
             }
           >
             −
@@ -109,9 +75,7 @@ export function LocationPicker({
           <Text
             style={[styles.radiusButton, { color: colors.primary }]}
             onPress={() =>
-              onRadiusChange(
-                Math.min(MAX_RADIUS_METERS, radiusMeters + 25)
-              )
+              onRadiusChange(Math.min(MAX_RADIUS_METERS, radiusMeters + 25))
             }
           >
             +
@@ -132,9 +96,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     overflow: "hidden",
   },
-  map: {
-    height: Platform.OS === "web" ? 240 : 220,
-    width: "100%",
+  mapPlaceholder: {
+    height: 220,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    padding: spacing.md,
+  },
+  placeholderText: {
+    ...typography.caption,
+    textAlign: "center",
+  },
+  coords: {
+    ...typography.label,
   },
   radiusControl: {
     padding: spacing.md,

@@ -1,11 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
+import { Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
 import { spacing } from "@/constants/theme";
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -16,9 +20,10 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: spacing.sm,
+          height: 64 + insets.bottom,
+          paddingBottom: spacing.sm + insets.bottom,
           paddingTop: spacing.xs,
+          marginBottom: spacing.md,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabInactive,
@@ -45,11 +50,20 @@ export default function TabLayout() {
       <Tabs.Screen
         name="create"
         options={{
-          title: "",
+          title: "Create Task",
           tabBarIcon: ({ color }) => (
             <Ionicons name="add-circle" size={36} color={color} />
           ),
           tabBarLabel: () => null,
+          headerLeft: () => (
+            <Pressable
+              onPress={() => router.replace("/(tabs)")}
+              style={{ marginLeft: spacing.md }}
+              hitSlop={8}
+            >
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </Pressable>
+          ),
         }}
       />
       <Tabs.Screen

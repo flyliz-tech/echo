@@ -10,9 +10,7 @@ function taskToFormValues(task: Task): TaskFormValues {
   return {
     title: task.title,
     notes: task.notes ?? "",
-    hasTimeTrigger: task.triggerType === "time" && !!task.triggerTime,
     triggerTime: task.triggerTime ? new Date(task.triggerTime) : null,
-    hasLocationTrigger: task.triggerType === "location",
     latitude: task.latitude,
     longitude: task.longitude,
     locationName: task.locationName ?? "",

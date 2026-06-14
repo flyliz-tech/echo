@@ -56,14 +56,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="task/[id]/index"
-            options={{ title: "View", presentation: "card" }}
-          />
-          <Stack.Screen
-            name="task/[id]/edit"
-            options={{ title: "Edit", presentation: "card" }}
-          />
+          <Stack.Screen name="task/[id]" options={{ headerShown: false }} />
         </Stack>
 
         {pendingDelete && (

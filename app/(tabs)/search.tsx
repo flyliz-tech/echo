@@ -36,7 +36,12 @@ export default function SearchScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={["bottom"]}
     >
-      <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.primary }]}>
+      <View
+        style={[
+          styles.searchBar,
+          { backgroundColor: colors.surface, borderColor: colors.primary },
+        ]}
+      >
         <Ionicons name="search" size={20} color={colors.primary} />
         <TextInput
           value={localQuery}

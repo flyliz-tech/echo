@@ -6,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View,
@@ -26,9 +25,7 @@ import {
 export interface TaskFormValues {
   title: string;
   notes: string;
-  hasTimeTrigger: boolean;
   triggerTime: Date | null;
-  hasLocationTrigger: boolean;
   latitude: number | null;
   longitude: number | null;
   locationName: string;
@@ -45,9 +42,7 @@ interface TaskFormProps {
 const defaultValues: TaskFormValues = {
   title: "",
   notes: "",
-  hasTimeTrigger: false,
   triggerTime: null,
-  hasLocationTrigger: false,
   latitude: null,
   longitude: null,
   locationName: "",
@@ -78,23 +73,17 @@ export function TaskForm({
     const input: CreateTaskInput = {
       title: values.title,
       notes: values.notes || null,
-      triggerTime:
-        values.hasTimeTrigger && values.triggerTime
-          ? values.triggerTime.toISOString()
-          : null,
-      latitude: values.hasLocationTrigger ? values.latitude : null,
-      longitude: values.hasLocationTrigger ? values.longitude : null,
-      locationName: values.hasLocationTrigger
-        ? values.locationName || null
-        : null,
+      triggerTime: values.triggerTime ? values.triggerTime.toISOString() : null,
+      latitude: values.latitude,
+      longitude: values.longitude,
+      locationName: values.locationName || null,
       radiusMeters: values.radiusMeters,
       triggerType: deriveTriggerType({
-        latitude: values.hasLocationTrigger ? values.latitude : null,
-        longitude: values.hasLocationTrigger ? values.longitude : null,
-        triggerTime:
-          values.hasTimeTrigger && values.triggerTime
-            ? values.triggerTime.toISOString()
-            : null,
+        latitude: values.latitude,
+        longitude: values.longitude,
+        triggerTime: values.triggerTime
+          ? values.triggerTime.toISOString()
+          : null,
       }),
     };
 
@@ -122,7 +111,7 @@ export function TaskForm({
     >
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Title ({values.title.length}/{TITLE_MAX_LENGTH})
+          Enter title of task ({values.title.length}/{TITLE_MAX_LENGTH})
         </Text>
         <TextInput
           value={values.title}
@@ -132,100 +121,75 @@ export function TaskForm({
           maxLength={TITLE_MAX_LENGTH}
           style={[
             styles.input,
-            { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
+            {
+              color: colors.text,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
           ]}
         />
       </View>
 
-      <View style={[styles.section, { borderColor: colors.border }]}>
-        <View style={styles.switchRow}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Time trigger
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
+          Select date and time
+        </Text>
+        <Pressable
+          onPress={() => setShowDatePicker(true)}
+          style={[styles.pickerButton, { borderColor: colors.border }]}
+        >
+          <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+          <Text style={[styles.pickerText, { color: colors.text }]}>
+            {values.triggerTime
+              ? values.triggerTime.toLocaleString()
+              : "Select date and time"}
           </Text>
-          <Switch
-            value={values.hasTimeTrigger}
-            onValueChange={(hasTimeTrigger) => {
-              update({
-                hasTimeTrigger,
-                triggerTime: hasTimeTrigger
-                  ? values.triggerTime ?? new Date()
-                  : values.triggerTime,
-              });
+        </Pressable>
+        {showDatePicker && (
+          <DateTimePicker
+            value={values.triggerTime ?? new Date()}
+            mode="datetime"
+            onChange={(_, date) => {
+              setShowDatePicker(Platform.OS === "ios");
+              if (date) update({ triggerTime: date });
             }}
-            trackColor={{ true: colors.primary }}
           />
-        </View>
-        {values.hasTimeTrigger && (
-          <>
-            <Pressable
-              onPress={() => setShowDatePicker(true)}
-              style={[styles.pickerButton, { borderColor: colors.border }]}
-            >
-              <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-              <Text style={[styles.pickerText, { color: colors.text }]}>
-                {values.triggerTime
-                  ? values.triggerTime.toLocaleString()
-                  : "Select date and time"}
-              </Text>
-            </Pressable>
-            {showDatePicker && (
-              <DateTimePicker
-                value={values.triggerTime ?? new Date()}
-                mode="datetime"
-                onChange={(_, date) => {
-                  setShowDatePicker(Platform.OS === "ios");
-                  if (date) update({ triggerTime: date });
-                }}
-              />
-            )}
-          </>
-        )}
-      </View>
-
-      <View style={[styles.section, { borderColor: colors.border }]}>
-        <View style={styles.switchRow}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Location trigger
-          </Text>
-          <Switch
-            value={values.hasLocationTrigger}
-            onValueChange={(hasLocationTrigger) => update({ hasLocationTrigger })}
-            trackColor={{ true: colors.primary }}
-          />
-        </View>
-        {values.hasLocationTrigger && (
-          <>
-            <TextInput
-              value={values.locationName}
-              onChangeText={(locationName) => update({ locationName })}
-              placeholder="Location name (e.g. Navami, Moodbidri)"
-              placeholderTextColor={colors.textSecondary}
-              style={[
-                styles.input,
-                {
-                  color: colors.text,
-                  borderColor: colors.border,
-                  backgroundColor: colors.surface,
-                  marginBottom: spacing.sm,
-                },
-              ]}
-            />
-            <LocationPicker
-              latitude={values.latitude}
-              longitude={values.longitude}
-              radiusMeters={values.radiusMeters}
-              onLocationChange={(latitude, longitude) =>
-                update({ latitude, longitude })
-              }
-              onRadiusChange={(radiusMeters) => update({ radiusMeters })}
-            />
-          </>
         )}
       </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Notes ({values.notes.length}/{NOTES_MAX_LENGTH})
+          Pick location
+        </Text>
+        <TextInput
+          value={values.locationName}
+          onChangeText={(locationName) => update({ locationName })}
+          placeholder="Location name (e.g. Navami, Moodbidri)"
+          placeholderTextColor={colors.textSecondary}
+          style={[
+            styles.input,
+            {
+              color: colors.text,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+              marginBottom: spacing.sm,
+            },
+          ]}
+        />
+        <LocationPicker
+          latitude={values.latitude}
+          longitude={values.longitude}
+          radiusMeters={values.radiusMeters}
+          onLocationChange={(latitude, longitude) =>
+            update({ latitude, longitude })
+          }
+          onRadiusChange={(radiusMeters) => update({ radiusMeters })}
+        />
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
+          Add notes ({values.notes.length}/{NOTES_MAX_LENGTH})
         </Text>
         <TextInput
           value={values.notes}
@@ -239,7 +203,11 @@ export function TaskForm({
           style={[
             styles.input,
             styles.notesInput,
-            { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface },
+            {
+              color: colors.text,
+              borderColor: colors.border,
+              backgroundColor: colors.surface,
+            },
           ]}
         />
       </View>
@@ -300,22 +268,6 @@ const styles = StyleSheet.create({
   notesInput: {
     minHeight: 100,
     paddingTop: spacing.sm,
-  },
-  section: {
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  sectionTitle: {
-    ...typography.heading,
-    fontSize: 16,
-  },
-  switchRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.sm,
   },
   pickerButton: {
     flexDirection: "row",

@@ -15,32 +15,17 @@ A contextual spatial task manager built with Expo. Tasks echo back when you're i
 
 ```bash
 npm install
-cp .env.example .env
-# Add your Google Maps API key to .env
 npm start
 ```
 
 For Android native features (maps, geofencing, notifications):
 
 ```bash
-export GOOGLE_MAPS_API_KEY=your_key_here
 npm run android:prebuild
 npm run android
 ```
 
-## Google Maps API Key (Android)
-
-1. Create a project in [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable **Maps SDK for Android**
-3. Create an API key restricted to your app's package name (`com.gauthamprasad.echo`)
-4. Set `GOOGLE_MAPS_API_KEY` in `.env` or export it before prebuild:
-
-```bash
-export GOOGLE_MAPS_API_KEY=your_android_maps_api_key
-npx expo prebuild --platform android
-```
-
-The key is injected via [`app.config.js`](app.config.js) into the Android manifest at prebuild time. Do not commit API keys.
+Maps use [MapLibre](https://maplibre.org/) with free [OpenFreeMap](https://openfreemap.org/) tiles — no API key required.
 
 ## Android Permissions
 
