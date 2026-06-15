@@ -7,6 +7,7 @@ import {
   Task,
   UpdateTaskInput,
   deriveTriggerType,
+  normalizeTriggerFields,
 } from "../types/task";
 
 interface TaskRow {
@@ -61,17 +62,18 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
   const id = Crypto.randomUUID();
   const now = new Date().toISOString();
   const triggerType = input.triggerType ?? deriveTriggerType(input);
+  const triggerFields = normalizeTriggerFields(input, triggerType);
 
   const task: Task = {
     id,
     title: input.title.trim(),
     notes: input.notes?.trim() || null,
     triggerType,
-    latitude: input.latitude ?? null,
-    longitude: input.longitude ?? null,
+    latitude: triggerFields.latitude,
+    longitude: triggerFields.longitude,
     radiusMeters: input.radiusMeters ?? DEFAULT_RADIUS_METERS,
-    locationName: input.locationName?.trim() || null,
-    triggerTime: input.triggerTime ?? null,
+    locationName: triggerFields.locationName,
+    triggerTime: triggerFields.triggerTime,
     isCompleted: false,
     createdAt: now,
   };
@@ -106,8 +108,7 @@ export async function updateTask(
   const existing = await getTaskById(id);
   if (!existing) return null;
 
-  const merged: Task = {
-    ...existing,
+  const mergedInput: CreateTaskInput = {
     title: input.title?.trim() ?? existing.title,
     notes:
       input.notes !== undefined
@@ -123,19 +124,26 @@ export async function updateTask(
         : existing.locationName,
     triggerTime:
       input.triggerTime !== undefined ? input.triggerTime : existing.triggerTime,
+    timeEnabled: input.timeEnabled,
+    locationEnabled: input.locationEnabled,
+    triggerType: input.triggerType,
+  };
+
+  const triggerType =
+    mergedInput.triggerType ?? deriveTriggerType(mergedInput);
+  const triggerFields = normalizeTriggerFields(mergedInput, triggerType);
+
+  const merged: Task = {
+    ...existing,
+    title: mergedInput.title!,
+    notes: mergedInput.notes ?? null,
+    latitude: triggerFields.latitude,
+    longitude: triggerFields.longitude,
+    radiusMeters: mergedInput.radiusMeters ?? existing.radiusMeters,
+    locationName: triggerFields.locationName,
+    triggerTime: triggerFields.triggerTime,
     isCompleted: input.isCompleted ?? existing.isCompleted,
-    triggerType:
-      input.triggerType ??
-      deriveTriggerType({
-        latitude:
-          input.latitude !== undefined ? input.latitude : existing.latitude,
-        longitude:
-          input.longitude !== undefined ? input.longitude : existing.longitude,
-        triggerTime:
-          input.triggerTime !== undefined
-            ? input.triggerTime
-            : existing.triggerTime,
-      }),
+    triggerType,
   };
 
   const db = await getDatabase();
@@ -178,8 +186,8 @@ export async function seedDevTasks(): Promise<void> {
     title: "Buy Milk",
     notes: "Nandini 1 ltr",
     triggerType: "time",
+    timeEnabled: true,
     triggerTime: tomorrow.toISOString(),
-    locationName: "Navami, Moodbidri",
   });
 
   await createTask({

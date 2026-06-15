@@ -1,4 +1,4 @@
-export type TriggerType = "location" | "time" | "none";
+export type TriggerType = "location" | "time" | "both" | "none";
 
 export type SortMode = "default" | "triggerTime" | "showCompleted";
 
@@ -19,7 +19,9 @@ export interface Task {
 export interface CreateTaskInput {
   title: string;
   notes?: string | null;
-  triggerType: TriggerType;
+  triggerType?: TriggerType;
+  timeEnabled?: boolean;
+  locationEnabled?: boolean;
   latitude?: number | null;
   longitude?: number | null;
   radiusMeters?: number;
@@ -37,18 +39,58 @@ export const DEFAULT_RADIUS_METERS = 150;
 export const MIN_RADIUS_METERS = 50;
 export const MAX_RADIUS_METERS = 500;
 
+export function hasTimeTrigger(task: Pick<Task, "triggerType">): boolean {
+  return task.triggerType === "time" || task.triggerType === "both";
+}
+
+export function hasLocationTrigger(task: Pick<Task, "triggerType">): boolean {
+  return task.triggerType === "location" || task.triggerType === "both";
+}
+
 export function deriveTriggerType(input: {
+  timeEnabled?: boolean;
+  locationEnabled?: boolean;
   latitude?: number | null;
   longitude?: number | null;
   triggerTime?: string | null;
 }): TriggerType {
-  const hasLocation =
-    input.latitude != null && input.longitude != null;
-  const hasTime = input.triggerTime != null;
+  const locationOn =
+    input.locationEnabled === true ||
+    (input.locationEnabled !== false &&
+      input.latitude != null &&
+      input.longitude != null);
+  const timeOn =
+    input.timeEnabled === true ||
+    (input.timeEnabled !== false && input.triggerTime != null);
 
+  const hasLocation =
+    locationOn && input.latitude != null && input.longitude != null;
+  const hasTime = timeOn && input.triggerTime != null;
+
+  if (hasLocation && hasTime) return "both";
   if (hasLocation) return "location";
   if (hasTime) return "time";
   return "none";
+}
+
+export function normalizeTriggerFields(
+  input: CreateTaskInput,
+  triggerType: TriggerType
+): Pick<
+  Task,
+  "triggerTime" | "latitude" | "longitude" | "locationName"
+> {
+  const timeActive = triggerType === "time" || triggerType === "both";
+  const locationActive = triggerType === "location" || triggerType === "both";
+
+  return {
+    triggerTime: timeActive ? input.triggerTime ?? null : null,
+    latitude: locationActive ? input.latitude ?? null : null,
+    longitude: locationActive ? input.longitude ?? null : null,
+    locationName: locationActive
+      ? input.locationName?.trim() || null
+      : null,
+  };
 }
 
 export function validateTaskInput(input: CreateTaskInput): string | null {
@@ -61,17 +103,39 @@ export function validateTaskInput(input: CreateTaskInput): string | null {
     return `Notes must be ${NOTES_MAX_LENGTH} characters or less`;
   }
 
-  const triggerType = input.triggerType ?? deriveTriggerType(input);
-  if (triggerType === "none") {
-    return "Add a time or location trigger";
+  const timeEnabled = input.timeEnabled ?? input.triggerTime != null;
+  const locationEnabled =
+    input.locationEnabled ??
+    (input.latitude != null && input.longitude != null);
+
+  const triggerType =
+    input.triggerType ??
+    deriveTriggerType({
+      timeEnabled,
+      locationEnabled,
+      latitude: input.latitude,
+      longitude: input.longitude,
+      triggerTime: input.triggerTime,
+    });
+
+  if (timeEnabled && !input.triggerTime) {
+    return "Select a date and time";
   }
-  if (triggerType === "location") {
-    if (input.latitude == null || input.longitude == null) {
-      return "Pick a location on the map";
-    }
+  if (
+    locationEnabled &&
+    (input.latitude == null || input.longitude == null)
+  ) {
+    return "Pick a location on the map";
   }
-  if (triggerType === "time") {
-    if (!input.triggerTime) return "Select a date and time";
+
+  if (triggerType === "time" && !input.triggerTime) {
+    return "Select a date and time";
+  }
+  if (
+    triggerType === "location" &&
+    (input.latitude == null || input.longitude == null)
+  ) {
+    return "Pick a location on the map";
   }
 
   return null;

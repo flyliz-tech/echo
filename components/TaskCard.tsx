@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
 import { radius, spacing, typography } from "@/constants/theme";
-import { Task } from "@/lib/types/task";
+import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 
 interface TaskCardProps {
@@ -54,7 +54,7 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
           {task.title}
         </Text>
 
-        {task.triggerType === "time" && task.triggerTime && (
+        {hasTimeTrigger(task) && task.triggerTime && (
           <View style={styles.row}>
             <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
             <Text style={[styles.detail, { color: colors.textSecondary }]}>
@@ -63,7 +63,7 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
           </View>
         )}
 
-        {task.triggerType === "location" && task.locationName && (
+        {hasLocationTrigger(task) && task.locationName && (
           <View style={styles.row}>
             <Ionicons
               name="location-outline"

@@ -3,13 +3,15 @@ import { Text, View } from "react-native";
 
 import { TaskForm, TaskFormValues } from "@/components/TaskForm";
 import { useTheme } from "@/hooks/useTheme";
-import { Task } from "@/lib/types/task";
+import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 function taskToFormValues(task: Task): TaskFormValues {
   return {
     title: task.title,
     notes: task.notes ?? "",
+    timeEnabled: hasTimeTrigger(task),
+    locationEnabled: hasLocationTrigger(task),
     triggerTime: task.triggerTime ? new Date(task.triggerTime) : null,
     latitude: task.latitude,
     longitude: task.longitude,

@@ -13,7 +13,12 @@ import setNotificationChannelAsync from "expo-notifications/build/setNotificatio
 import { Platform } from "react-native";
 
 import { getAllTasks, getTaskById } from "@/lib/db/tasks";
-import { Task } from "@/lib/types/task";
+import {
+  locationArrivalNotificationBody,
+  notificationTitle,
+  scheduledTimeNotificationBody,
+} from "@/lib/services/notificationContent";
+import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 
 const NOTIFICATION_PREFIX = "echo-task-";
 
@@ -47,7 +52,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 }
 
 async function scheduleTimeNotification(task: Task): Promise<void> {
-  if (task.triggerType !== "time" || !task.triggerTime || task.isCompleted) {
+  if (!hasTimeTrigger(task) || !task.triggerTime || task.isCompleted) {
     return;
   }
 
@@ -57,9 +62,9 @@ async function scheduleTimeNotification(task: Task): Promise<void> {
   await scheduleNotificationAsync({
     identifier: notificationId(task.id),
     content: {
-      title: task.title,
-      body: task.notes || "Time to complete your task",
-      data: { taskId: task.id },
+      title: notificationTitle(task, "time"),
+      body: scheduledTimeNotificationBody(task),
+      data: { taskId: task.id, triggerKind: "time" },
     },
     trigger: {
       type: SchedulableTriggerInputTypes.DATE,
@@ -74,16 +79,14 @@ async function cancelTaskNotification(taskId: string): Promise<void> {
 
 export async function notifyGeofenceEntry(taskId: string): Promise<void> {
   const task = await getTaskById(taskId);
-  if (!task || task.isCompleted) return;
+  if (!task || task.isCompleted || !hasLocationTrigger(task)) return;
 
   await scheduleNotificationAsync({
     identifier: `${notificationId(taskId)}-geofence`,
     content: {
-      title: task.title,
-      body: task.locationName
-        ? `You're near ${task.locationName}`
-        : "You've arrived at your task location",
-      data: { taskId: task.id },
+      title: notificationTitle(task, "location"),
+      body: locationArrivalNotificationBody(task),
+      data: { taskId: task.id, triggerKind: "location" },
     },
     trigger: null,
   });
@@ -101,7 +104,7 @@ export async function syncNotifications(): Promise<void> {
   }
 
   const hasTimeTasks = tasks.some(
-    (t) => t.triggerType === "time" && !t.isCompleted && t.triggerTime
+    (t) => hasTimeTrigger(t) && !t.isCompleted && t.triggerTime
   );
 
   if (hasTimeTasks) {
@@ -109,7 +112,7 @@ export async function syncNotifications(): Promise<void> {
   }
 
   for (const task of tasks) {
-    if (task.triggerType === "time" && !task.isCompleted) {
+    if (hasTimeTrigger(task) && !task.isCompleted) {
       await scheduleTimeNotification(task);
     } else {
       await cancelTaskNotification(task.id);

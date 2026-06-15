@@ -2,7 +2,7 @@ import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 
 import { getAllTasks } from "@/lib/db/tasks";
-import { Task } from "@/lib/types/task";
+import { Task, hasLocationTrigger } from "@/lib/types/task";
 import { notifyGeofenceEntry } from "@/lib/services/notifications";
 
 export const GEOFENCE_TASK_NAME = "echo-geofence-task";
@@ -29,7 +29,7 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }) => {
 
 function taskToRegion(task: Task): Location.LocationRegion | null {
   if (
-    task.triggerType !== "location" ||
+    !hasLocationTrigger(task) ||
     task.isCompleted ||
     task.latitude == null ||
     task.longitude == null

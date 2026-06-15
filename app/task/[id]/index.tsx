@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/hooks/useTheme";
 import { radius, spacing, typography } from "@/constants/theme";
 import { formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
+import { hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function ViewTaskScreen() {
@@ -36,7 +37,7 @@ export default function ViewTaskScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.title, { color: colors.text }]}>{task.title}</Text>
 
-        {task.triggerType === "time" && task.triggerTime && (
+        {hasTimeTrigger(task) && task.triggerTime && (
           <View style={styles.row}>
             <Ionicons name="time-outline" size={20} color={colors.primary} />
             <Text style={[styles.detail, { color: colors.text }]}>
@@ -45,7 +46,7 @@ export default function ViewTaskScreen() {
           </View>
         )}
 
-        {task.triggerType === "location" && (
+        {hasLocationTrigger(task) && (
           <>
             {task.locationName && (
               <View style={styles.row}>

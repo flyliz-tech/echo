@@ -5,6 +5,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
+import { hasLocationTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function MapTabScreenFallback() {
@@ -18,7 +19,7 @@ export default function MapTabScreenFallback() {
       tasks.filter(
         (t) =>
           !t.isCompleted &&
-          t.triggerType === "location" &&
+          hasLocationTrigger(t) &&
           t.latitude != null &&
           t.longitude != null
       ),

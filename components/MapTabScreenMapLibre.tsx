@@ -22,7 +22,7 @@ import {
   latitudeDeltaToZoom,
   MAP_STYLE_URL,
 } from "@/constants/map";
-import { Task } from "@/lib/types/task";
+import { Task, hasLocationTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -37,7 +37,7 @@ export default function MapTabScreenMapLibre() {
       tasks.filter(
         (t) =>
           !t.isCompleted &&
-          t.triggerType === "location" &&
+          hasLocationTrigger(t) &&
           t.latitude != null &&
           t.longitude != null
       ),

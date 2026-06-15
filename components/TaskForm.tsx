@@ -8,6 +8,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
@@ -27,6 +28,8 @@ import {
 export interface TaskFormValues {
   title: string;
   notes: string;
+  timeEnabled: boolean;
+  locationEnabled: boolean;
   triggerTime: Date | null;
   latitude: number | null;
   longitude: number | null;
@@ -44,6 +47,8 @@ interface TaskFormProps {
 const defaultValues: TaskFormValues = {
   title: "",
   notes: "",
+  timeEnabled: false,
+  locationEnabled: false,
   triggerTime: null,
   latitude: null,
   longitude: null,
@@ -115,17 +120,28 @@ export function TaskForm({
     const input: CreateTaskInput = {
       title: values.title,
       notes: values.notes || null,
-      triggerTime: values.triggerTime ? values.triggerTime.toISOString() : null,
-      latitude: values.latitude,
-      longitude: values.longitude,
-      locationName: values.locationName || null,
-      radiusMeters: values.radiusMeters,
-      triggerType: deriveTriggerType({
-        latitude: values.latitude,
-        longitude: values.longitude,
-        triggerTime: values.triggerTime
+      timeEnabled: values.timeEnabled,
+      locationEnabled: values.locationEnabled,
+      triggerTime:
+        values.timeEnabled && values.triggerTime
           ? values.triggerTime.toISOString()
           : null,
+      latitude: values.locationEnabled ? values.latitude : null,
+      longitude: values.locationEnabled ? values.longitude : null,
+      locationName:
+        values.locationEnabled && values.locationName
+          ? values.locationName
+          : null,
+      radiusMeters: values.radiusMeters,
+      triggerType: deriveTriggerType({
+        timeEnabled: values.timeEnabled,
+        locationEnabled: values.locationEnabled,
+        latitude: values.locationEnabled ? values.latitude : null,
+        longitude: values.locationEnabled ? values.longitude : null,
+        triggerTime:
+          values.timeEnabled && values.triggerTime
+            ? values.triggerTime.toISOString()
+            : null,
       }),
     };
 
@@ -173,60 +189,110 @@ export function TaskForm({
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Select date and time
-        </Text>
-        <Pressable
-          onPress={openDateTimePicker}
-          style={[styles.pickerButton, { borderColor: colors.border }]}
-        >
-          <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-          <Text style={[styles.pickerText, { color: colors.text }]}>
-            {values.triggerTime
-              ? values.triggerTime.toLocaleString()
-              : "Select date and time"}
+        <View style={styles.triggerHeader}>
+          <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 0 }]}>
+            Time reminder
           </Text>
-        </Pressable>
-        {showDatePicker && Platform.OS === "ios" && (
-          <DateTimePicker
-            value={values.triggerTime ?? new Date()}
-            mode="datetime"
-            display="spinner"
-            onChange={(_, date) => {
-              if (date) update({ triggerTime: date });
+          <Switch
+            value={values.timeEnabled}
+            onValueChange={(timeEnabled) => {
+              if (!timeEnabled) {
+                update({ timeEnabled: false, triggerTime: null });
+                setShowDatePicker(false);
+                return;
+              }
+              update({ timeEnabled: true });
             }}
+            trackColor={{ false: colors.border, true: colors.primaryMuted }}
+            thumbColor={values.timeEnabled ? colors.primary : colors.surface}
           />
+        </View>
+        {values.timeEnabled ? (
+          <>
+            <Pressable
+              onPress={openDateTimePicker}
+              style={[styles.pickerButton, { borderColor: colors.border }]}
+            >
+              <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+              <Text style={[styles.pickerText, { color: colors.text }]}>
+                {values.triggerTime
+                  ? values.triggerTime.toLocaleString()
+                  : "Select date and time"}
+              </Text>
+            </Pressable>
+            {showDatePicker && Platform.OS === "ios" && (
+              <DateTimePicker
+                value={values.triggerTime ?? new Date()}
+                mode="datetime"
+                display="spinner"
+                onChange={(_, date) => {
+                  if (date) update({ triggerTime: date });
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <Text style={[styles.hint, { color: colors.textSecondary }]}>
+            Optional — remind when this task is due
+          </Text>
         )}
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Pick location
-        </Text>
-        <TextInput
-          value={values.locationName}
-          onChangeText={(locationName) => update({ locationName })}
-          placeholder="Location name (e.g. Navami, Moodbidri)"
-          placeholderTextColor={colors.textSecondary}
-          style={[
-            styles.input,
-            {
-              color: colors.text,
-              borderColor: colors.border,
-              backgroundColor: colors.surface,
-              marginBottom: spacing.sm,
-            },
-          ]}
-        />
-        <LocationPicker
-          latitude={values.latitude}
-          longitude={values.longitude}
-          radiusMeters={values.radiusMeters}
-          onLocationChange={(latitude, longitude) =>
-            update({ latitude, longitude })
-          }
-          onRadiusChange={(radiusMeters) => update({ radiusMeters })}
-        />
+        <View style={styles.triggerHeader}>
+          <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 0 }]}>
+            Location reminder
+          </Text>
+          <Switch
+            value={values.locationEnabled}
+            onValueChange={(locationEnabled) => {
+              if (!locationEnabled) {
+                update({
+                  locationEnabled: false,
+                  latitude: null,
+                  longitude: null,
+                  locationName: "",
+                });
+                return;
+              }
+              update({ locationEnabled: true });
+            }}
+            trackColor={{ false: colors.border, true: colors.primaryMuted }}
+            thumbColor={values.locationEnabled ? colors.primary : colors.surface}
+          />
+        </View>
+        {values.locationEnabled ? (
+          <>
+            <TextInput
+              value={values.locationName}
+              onChangeText={(locationName) => update({ locationName })}
+              placeholder="Location name (e.g. Navami, Moodbidri)"
+              placeholderTextColor={colors.textSecondary}
+              style={[
+                styles.input,
+                {
+                  color: colors.text,
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface,
+                  marginBottom: spacing.sm,
+                },
+              ]}
+            />
+            <LocationPicker
+              latitude={values.latitude}
+              longitude={values.longitude}
+              radiusMeters={values.radiusMeters}
+              onLocationChange={(latitude, longitude) =>
+                update({ latitude, longitude })
+              }
+              onRadiusChange={(radiusMeters) => update({ radiusMeters })}
+            />
+          </>
+        ) : (
+          <Text style={[styles.hint, { color: colors.textSecondary }]}>
+            Optional — remind when you arrive nearby
+          </Text>
+        )}
       </View>
 
       <View style={styles.field}>
@@ -322,6 +388,15 @@ const styles = StyleSheet.create({
   pickerText: {
     ...typography.body,
     flex: 1,
+  },
+  triggerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
+  },
+  hint: {
+    ...typography.caption,
   },
   error: {
     ...typography.caption,

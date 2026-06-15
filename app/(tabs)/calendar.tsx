@@ -26,6 +26,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
+import { hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -39,7 +40,7 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const timeTasks = useMemo(
-    () => tasks.filter((t) => t.triggerType === "time" && t.triggerTime),
+    () => tasks.filter((t) => hasTimeTrigger(t) && t.triggerTime),
     [tasks]
   );
 
