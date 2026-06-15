@@ -1,4 +1,15 @@
-import * as Notifications from "expo-notifications";
+import { setNotificationHandler } from "expo-notifications/build/NotificationsHandler";
+import {
+  getPermissionsAsync,
+  requestPermissionsAsync,
+} from "expo-notifications/build/NotificationPermissions";
+import { addNotificationResponseReceivedListener } from "expo-notifications/build/NotificationsEmitter";
+import { SchedulableTriggerInputTypes } from "expo-notifications/build/Notifications.types";
+import { AndroidImportance } from "expo-notifications/build/NotificationChannelManager.types";
+import cancelScheduledNotificationAsync from "expo-notifications/build/cancelScheduledNotificationAsync";
+import getAllScheduledNotificationsAsync from "expo-notifications/build/getAllScheduledNotificationsAsync";
+import scheduleNotificationAsync from "expo-notifications/build/scheduleNotificationAsync";
+import setNotificationChannelAsync from "expo-notifications/build/setNotificationChannelAsync";
 import { Platform } from "react-native";
 
 import { getAllTasks, getTaskById } from "@/lib/db/tasks";
@@ -6,7 +17,7 @@ import { Task } from "@/lib/types/task";
 
 const NOTIFICATION_PREFIX = "echo-task-";
 
-Notifications.setNotificationHandler({
+setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
@@ -22,17 +33,17 @@ function notificationId(taskId: string): string {
 
 export async function requestNotificationPermissions(): Promise<boolean> {
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
+    await setNotificationChannelAsync("default", {
       name: "Echo Reminders",
-      importance: Notifications.AndroidImportance.HIGH,
+      importance: AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
     });
   }
 
-  const { status: existing } = await Notifications.getPermissionsAsync();
+  const { status: existing } = await getPermissionsAsync();
   if (existing === "granted") return true;
 
-  const { status } = await Notifications.requestPermissionsAsync();
+  const { status } = await requestPermissionsAsync();
   return status === "granted";
 }
 
@@ -44,7 +55,7 @@ async function scheduleTimeNotification(task: Task): Promise<void> {
   const triggerDate = new Date(task.triggerTime);
   if (triggerDate.getTime() <= Date.now()) return;
 
-  await Notifications.scheduleNotificationAsync({
+  await scheduleNotificationAsync({
     identifier: notificationId(task.id),
     content: {
       title: task.title,
@@ -52,23 +63,21 @@ async function scheduleTimeNotification(task: Task): Promise<void> {
       data: { taskId: task.id },
     },
     trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      type: SchedulableTriggerInputTypes.DATE,
       date: triggerDate,
     },
   });
 }
 
 async function cancelTaskNotification(taskId: string): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(
-    notificationId(taskId)
-  );
+  await cancelScheduledNotificationAsync(notificationId(taskId));
 }
 
 export async function notifyGeofenceEntry(taskId: string): Promise<void> {
   const task = await getTaskById(taskId);
   if (!task || task.isCompleted) return;
 
-  await Notifications.scheduleNotificationAsync({
+  await scheduleNotificationAsync({
     identifier: `${notificationId(taskId)}-geofence`,
     content: {
       title: task.title,
@@ -83,13 +92,13 @@ export async function notifyGeofenceEntry(taskId: string): Promise<void> {
 
 export async function syncNotifications(): Promise<void> {
   const tasks = await getAllTasks();
-  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  const scheduled = await getAllScheduledNotificationsAsync();
   const echoScheduled = scheduled.filter((n) =>
     n.identifier.startsWith(NOTIFICATION_PREFIX)
   );
 
   for (const notification of echoScheduled) {
-    await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+    await cancelScheduledNotificationAsync(notification.identifier);
   }
 
   const hasTimeTasks = tasks.some(
@@ -112,14 +121,12 @@ export async function syncNotifications(): Promise<void> {
 export function setupNotificationResponseHandler(
   onTaskPress: (taskId: string) => void
 ): () => void {
-  const subscription = Notifications.addNotificationResponseReceivedListener(
-    (response) => {
-      const taskId = response.notification.request.content.data?.taskId;
-      if (typeof taskId === "string") {
-        onTaskPress(taskId);
-      }
+  const subscription = addNotificationResponseReceivedListener((response) => {
+    const taskId = response.notification.request.content.data?.taskId;
+    if (typeof taskId === "string") {
+      onTaskPress(taskId);
     }
-  );
+  });
 
   return () => subscription.remove();
 }

@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerAndroid,
+} from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import {
   Platform,
@@ -69,6 +71,46 @@ export function TaskForm({
     setError(null);
   };
 
+  const openDateTimePicker = () => {
+    if (Platform.OS === "android") {
+      const initial = values.triggerTime ?? new Date();
+      DateTimePickerAndroid.open({
+        value: initial,
+        mode: "date",
+        onChange: (event, selectedDate) => {
+          if (event.type !== "set" || !selectedDate) return;
+
+          const withDate = new Date(initial);
+          withDate.setFullYear(
+            selectedDate.getFullYear(),
+            selectedDate.getMonth(),
+            selectedDate.getDate()
+          );
+
+          DateTimePickerAndroid.open({
+            value: withDate,
+            mode: "time",
+            is24Hour: true,
+            onChange: (timeEvent, selectedTime) => {
+              if (timeEvent.type !== "set" || !selectedTime) return;
+              const result = new Date(withDate);
+              result.setHours(
+                selectedTime.getHours(),
+                selectedTime.getMinutes(),
+                0,
+                0
+              );
+              update({ triggerTime: result });
+            },
+          });
+        },
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
+  };
+
   const handleSubmit = async () => {
     const input: CreateTaskInput = {
       title: values.title,
@@ -135,7 +177,7 @@ export function TaskForm({
           Select date and time
         </Text>
         <Pressable
-          onPress={() => setShowDatePicker(true)}
+          onPress={openDateTimePicker}
           style={[styles.pickerButton, { borderColor: colors.border }]}
         >
           <Ionicons name="calendar-outline" size={20} color={colors.primary} />
@@ -145,12 +187,12 @@ export function TaskForm({
               : "Select date and time"}
           </Text>
         </Pressable>
-        {showDatePicker && (
+        {showDatePicker && Platform.OS === "ios" && (
           <DateTimePicker
             value={values.triggerTime ?? new Date()}
             mode="datetime"
+            display="spinner"
             onChange={(_, date) => {
-              setShowDatePicker(Platform.OS === "ios");
               if (date) update({ triggerTime: date });
             }}
           />
