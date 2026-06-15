@@ -82,6 +82,8 @@ export function TaskForm({
       DateTimePickerAndroid.open({
         value: initial,
         mode: "date",
+        design: "material",
+        title: "Select date",
         onChange: (event, selectedDate) => {
           if (event.type !== "set" || !selectedDate) return;
 
@@ -95,7 +97,10 @@ export function TaskForm({
           DateTimePickerAndroid.open({
             value: withDate,
             mode: "time",
+            design: "material",
+            initialInputMode: "keyboard",
             is24Hour: true,
+            title: "Select time",
             onChange: (timeEvent, selectedTime) => {
               if (timeEvent.type !== "set" || !selectedTime) return;
               const result = new Date(withDate);
@@ -224,7 +229,7 @@ export function TaskForm({
               <DateTimePicker
                 value={values.triggerTime ?? new Date()}
                 mode="datetime"
-                display="spinner"
+                display="inline"
                 onChange={(_, date) => {
                   if (date) update({ triggerTime: date });
                 }}
