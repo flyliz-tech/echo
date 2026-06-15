@@ -8,6 +8,28 @@ import { notifyGeofenceEntry } from "@/lib/services/notifications";
 export const GEOFENCE_TASK_NAME = "echo-geofence-task";
 const MAX_GEOFENCES = 100;
 
+type RegionSnapshot = {
+  identifier: string;
+  latitude: number;
+  longitude: number;
+  radius: number;
+};
+
+let activeRegionSnapshot: string | null = null;
+
+function serializeRegions(regions: Location.LocationRegion[]): string {
+  const snapshots: RegionSnapshot[] = regions
+    .map((region) => ({
+      identifier: region.identifier ?? "",
+      latitude: region.latitude,
+      longitude: region.longitude,
+      radius: region.radius,
+    }))
+    .sort((a, b) => a.identifier.localeCompare(b.identifier));
+
+  return JSON.stringify(snapshots);
+}
+
 TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }) => {
   if (error) {
     console.error("Geofence task error:", error);
@@ -86,7 +108,13 @@ export async function syncGeofences(): Promise<void> {
     if (regions.length === 0) {
       if (isRunning) {
         await Location.stopGeofencingAsync(GEOFENCE_TASK_NAME);
+        activeRegionSnapshot = null;
       }
+      return;
+    }
+
+    const nextSnapshot = serializeRegions(regions);
+    if (isRunning && activeRegionSnapshot === nextSnapshot) {
       return;
     }
 
@@ -95,6 +123,7 @@ export async function syncGeofences(): Promise<void> {
     }
 
     await Location.startGeofencingAsync(GEOFENCE_TASK_NAME, regions);
+    activeRegionSnapshot = nextSnapshot;
   } catch (error) {
     warnGeofencingUnavailable(
       `Geofencing API rejected: ${error instanceof Error ? error.message : String(error)};`

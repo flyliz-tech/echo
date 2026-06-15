@@ -21,6 +21,9 @@ import {
 import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 
 const NOTIFICATION_PREFIX = "echo-task-";
+const GEOFENCE_COOLDOWN_MS = 10 * 60 * 1000;
+
+const geofenceNotifiedAt = new Map<string, number>();
 
 setNotificationHandler({
   handleNotification: async () => ({
@@ -80,6 +83,14 @@ async function cancelTaskNotification(taskId: string): Promise<void> {
 export async function notifyGeofenceEntry(taskId: string): Promise<void> {
   const task = await getTaskById(taskId);
   if (!task || task.isCompleted || !hasLocationTrigger(task)) return;
+
+  const lastNotified = geofenceNotifiedAt.get(taskId);
+  const now = Date.now();
+  if (lastNotified != null && now - lastNotified < GEOFENCE_COOLDOWN_MS) {
+    return;
+  }
+
+  geofenceNotifiedAt.set(taskId, now);
 
   await scheduleNotificationAsync({
     identifier: `${notificationId(taskId)}-geofence`,

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 
 import { TaskForm } from "@/components/TaskForm";
 import { requestNotificationPermissions } from "@/lib/services/notifications";
+import { deriveTriggerType, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function CreateTaskScreen() {
@@ -13,7 +14,10 @@ export default function CreateTaskScreen() {
       submitLabel="Save"
       onCancel={() => router.replace("/(tabs)")}
       onSubmit={async (input) => {
-        await requestNotificationPermissions();
+        const triggerType = input.triggerType ?? deriveTriggerType(input);
+        if (hasTimeTrigger({ triggerType })) {
+          await requestNotificationPermissions();
+        }
         await createTask(input);
         router.replace("/(tabs)");
       }}

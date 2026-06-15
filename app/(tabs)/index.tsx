@@ -49,7 +49,7 @@ export default function HomeScreen() {
             backgroundColor: colors.surface,
             borderColor: isSearching ? colors.primary : colors.border,
             borderWidth: isSearching ? 2 : 1,
-            paddingVertical: isSearching ? spacing.md : spacing.sm,
+            paddingVertical: isSearching ? spacing.sm : spacing.xs,
           },
         ]}
       >
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...typography.body,
     fontSize: 15,
+    paddingVertical: 0,
   },
   sortLabel: {
     ...typography.caption,

@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.xs,
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     flex: 1,
     ...typography.body,
     fontSize: 16,
+    paddingVertical: 0,
   },
   list: {
     paddingBottom: spacing.lg,

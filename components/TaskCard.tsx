@@ -16,24 +16,22 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
   const { colors } = useTheme();
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
+    <View
+      style={[
         styles.card,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          opacity: task.isCompleted ? 0.6 : pressed ? 0.9 : 1,
+          opacity: task.isCompleted ? 0.6 : 1,
         },
       ]}
     >
       <Pressable
-        onPress={(e) => {
-          e.stopPropagation?.();
-          onToggleComplete();
-        }}
-        hitSlop={8}
+        onPress={onToggleComplete}
+        hitSlop={12}
         style={styles.checkbox}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: task.isCompleted }}
       >
         <Ionicons
           name={task.isCompleted ? "checkbox" : "square-outline"}
@@ -42,7 +40,13 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
         />
       </Pressable>
 
-      <View style={styles.content}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.content,
+          pressed && !task.isCompleted && styles.contentPressed,
+        ]}
+      >
         <Text
           style={[
             styles.title,
@@ -78,8 +82,8 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
             </Text>
           </View>
         )}
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 
@@ -99,6 +103,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: spacing.xs,
+  },
+  contentPressed: {
+    opacity: 0.9,
   },
   title: {
     ...typography.heading,
