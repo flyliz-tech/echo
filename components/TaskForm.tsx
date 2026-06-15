@@ -233,7 +233,7 @@ export function TaskForm({
           </>
         ) : (
           <Text style={[styles.hint, { color: colors.textSecondary }]}>
-            Optional — remind when this task is due
+            Remind when this task is due
           </Text>
         )}
       </View>
@@ -290,7 +290,7 @@ export function TaskForm({
           </>
         ) : (
           <Text style={[styles.hint, { color: colors.textSecondary }]}>
-            Optional — remind when you arrive nearby
+            Remind when you arrive nearby
           </Text>
         )}
       </View>
