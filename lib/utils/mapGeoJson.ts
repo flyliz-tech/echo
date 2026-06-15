@@ -1,4 +1,9 @@
-import type { Feature, FeatureCollection, Polygon } from "geojson";
+import type {
+  Feature,
+  FeatureCollection,
+  LineString,
+  Polygon,
+} from "geojson";
 
 const EARTH_RADIUS_METERS = 6_371_000;
 
@@ -34,8 +39,26 @@ export function circleFeatureCollection(
   latitude: number,
   radiusMeters: number
 ): FeatureCollection {
+  if (
+    !Number.isFinite(longitude) ||
+    !Number.isFinite(latitude) ||
+    radiusMeters <= 0
+  ) {
+    return { type: "FeatureCollection", features: [] };
+  }
+
+  const polygon = circlePolygon(longitude, latitude, radiusMeters);
+  const outline: Feature<LineString> = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: polygon.geometry.coordinates[0],
+    },
+    properties: {},
+  };
+
   return {
     type: "FeatureCollection",
-    features: [circlePolygon(longitude, latitude, radiusMeters)],
+    features: [polygon, outline],
   };
 }

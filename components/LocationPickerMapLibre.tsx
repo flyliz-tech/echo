@@ -103,14 +103,18 @@ export function LocationPickerMapLibre(props: LocationPickerProps) {
           />
           <GeoJSONSource id="picker-radius" data={radiusGeoJson}>
             <Layer
+              id="picker-radius-fill"
               type="fill"
+              filter={["==", ["geometry-type"], "Polygon"]}
               paint={{
                 "fill-color": "#2563EB",
                 "fill-opacity": 0.15,
               }}
             />
             <Layer
+              id="picker-radius-line"
               type="line"
+              filter={["==", ["geometry-type"], "LineString"]}
               paint={{
                 "line-color": "#2563EB",
                 "line-opacity": 0.5,
