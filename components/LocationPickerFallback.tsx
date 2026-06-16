@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { useTheme } from "@/hooks/useTheme";
 import { radius, spacing, typography } from "@/constants/theme";
 import { DEFAULT_CENTER } from "@/constants/map";
+import { GeocodeResult } from "@/lib/services/geocoding";
 import {
   DEFAULT_RADIUS_METERS,
   MAX_RADIUS_METERS,
@@ -14,7 +16,9 @@ export interface LocationPickerProps {
   latitude: number | null;
   longitude: number | null;
   radiusMeters: number;
+  locationName: string;
   onLocationChange: (latitude: number, longitude: number) => void;
+  onLocationNameChange: (name: string) => void;
   onRadiusChange: (radius: number) => void;
 }
 
@@ -22,7 +26,9 @@ export function LocationPickerFallback({
   latitude,
   longitude,
   radiusMeters,
+  locationName,
   onLocationChange,
+  onLocationNameChange,
   onRadiusChange,
   message = "Map picker requires a development build with MapLibre",
 }: LocationPickerProps & { message?: string }) {
@@ -40,8 +46,22 @@ export function LocationPickerFallback({
     setHasInitializedLocation(true);
   }, [hasInitializedLocation, onLocationChange]);
 
+  const handleSelectPlace = useCallback(
+    (place: GeocodeResult) => {
+      onLocationChange(place.latitude, place.longitude);
+      onLocationNameChange(place.name);
+    },
+    [onLocationChange, onLocationNameChange]
+  );
+
   return (
     <View style={styles.container}>
+      <PlaceSearchInput
+        value={locationName}
+        onChangeText={onLocationNameChange}
+        onSelectPlace={handleSelectPlace}
+        placeholder="Search for a place"
+      />
       <View
         style={[
           styles.mapPlaceholder,
@@ -93,12 +113,12 @@ export function LocationPickerFallback({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: radius.md,
-    overflow: "hidden",
+    gap: spacing.sm,
   },
   mapPlaceholder: {
     height: 220,
     borderWidth: 1,
+    borderRadius: radius.md,
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.sm,
@@ -114,6 +134,7 @@ const styles = StyleSheet.create({
   radiusControl: {
     padding: spacing.md,
     gap: spacing.xs,
+    borderRadius: radius.md,
   },
   radiusLabel: {
     ...typography.caption,

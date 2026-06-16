@@ -8,6 +8,7 @@ import {
   SortMode,
   Task,
   UpdateTaskInput,
+  hasTimeTrigger,
 } from "@/lib/types/task";
 
 interface PendingDelete {
@@ -15,7 +16,7 @@ interface PendingDelete {
   timeoutId: ReturnType<typeof setTimeout>;
 }
 
-interface TaskStore {
+export interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
   isInitialized: boolean;
@@ -37,31 +38,21 @@ interface TaskStore {
 }
 
 function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
-  const incomplete = tasks.filter((t) => !t.isCompleted);
-  const completed = tasks.filter((t) => t.isCompleted);
-
-  const sortIncomplete = (list: Task[]): Task[] => {
-    if (sortMode === "triggerTime") {
-      return [...list].sort((a, b) => {
-        if (!a.triggerTime && !b.triggerTime) return 0;
-        if (!a.triggerTime) return 1;
-        if (!b.triggerTime) return -1;
-        return a.triggerTime.localeCompare(b.triggerTime);
-      });
-    }
-    return [...list].sort(
-      (a, b) => b.createdAt.localeCompare(a.createdAt)
-    );
-  };
-
-  const sortedIncomplete = sortIncomplete(incomplete);
-  const sortedCompleted = sortIncomplete(completed);
-
   if (sortMode === "showCompleted") {
-    return [...sortedIncomplete, ...sortedCompleted];
+    return tasks
+      .filter((t) => t.isCompleted)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
-  return sortedIncomplete;
+  if (sortMode === "triggerTime") {
+    return tasks
+      .filter((t) => !t.isCompleted && hasTimeTrigger(t) && t.triggerTime)
+      .sort((a, b) => a.triggerTime!.localeCompare(b.triggerTime!));
+  }
+
+  return tasks
+    .filter((t) => !t.isCompleted)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 function filterTasks(tasks: Task[], query: string): Task[] {
@@ -78,6 +69,11 @@ function filterTasks(tasks: Task[], query: string): Task[] {
 
 async function syncTriggers(): Promise<void> {
   await Promise.all([syncGeofences(), syncNotifications()]);
+}
+
+export function selectFilteredTasks(state: TaskStore): Task[] {
+  const sorted = sortTasks(state.tasks, state.sortMode);
+  return filterTasks(sorted, state.searchQuery);
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -105,11 +101,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  getFilteredTasks: () => {
-    const { tasks, sortMode, searchQuery } = get();
-    const sorted = sortTasks(tasks, sortMode);
-    return filterTasks(sorted, searchQuery);
-  },
+  getFilteredTasks: () => selectFilteredTasks(get()),
 
   createTask: async (input) => {
     const task = await taskDb.createTask(input);

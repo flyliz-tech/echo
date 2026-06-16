@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -70,6 +70,14 @@ export function TaskForm({
   const [error, setError] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const update = (patch: Partial<TaskFormValues>) => {
     setValues((prev) => ({ ...prev, ...patch }));
@@ -82,8 +90,6 @@ export function TaskForm({
       DateTimePickerAndroid.open({
         value: initial,
         mode: "date",
-        design: "material",
-        title: "Select date",
         onChange: (event, selectedDate) => {
           if (event.type !== "set" || !selectedDate) return;
 
@@ -97,10 +103,7 @@ export function TaskForm({
           DateTimePickerAndroid.open({
             value: withDate,
             mode: "time",
-            design: "material",
-            initialInputMode: "keyboard",
             is24Hour: true,
-            title: "Select time",
             onChange: (timeEvent, selectedTime) => {
               if (timeEvent.type !== "set" || !selectedTime) return;
               const result = new Date(withDate);
@@ -162,7 +165,7 @@ export function TaskForm({
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to save task");
     } finally {
-      setIsSubmitting(false);
+      if (isMounted.current) setIsSubmitting(false);
     }
   };
 
@@ -206,7 +209,10 @@ export function TaskForm({
                 setShowDatePicker(false);
                 return;
               }
-              update({ timeEnabled: true });
+              update({
+                timeEnabled: true,
+                triggerTime: values.triggerTime ?? new Date(),
+              });
             }}
             trackColor={{ false: colors.border, true: colors.primaryMuted }}
             thumbColor={values.timeEnabled ? colors.primary : colors.surface}
@@ -226,14 +232,16 @@ export function TaskForm({
               </Text>
             </Pressable>
             {showDatePicker && Platform.OS === "ios" && (
-              <DateTimePicker
-                value={values.triggerTime ?? new Date()}
-                mode="datetime"
-                display="inline"
-                onChange={(_, date) => {
-                  if (date) update({ triggerTime: date });
-                }}
-              />
+              <View style={styles.iosDatePicker}>
+                <DateTimePicker
+                  value={values.triggerTime ?? new Date()}
+                  mode="datetime"
+                  display="spinner"
+                  onChange={(_, date) => {
+                    if (date) update({ triggerTime: date });
+                  }}
+                />
+              </View>
             )}
           </>
         ) : (
@@ -267,32 +275,17 @@ export function TaskForm({
           />
         </View>
         {values.locationEnabled ? (
-          <>
-            <TextInput
-              value={values.locationName}
-              onChangeText={(locationName) => update({ locationName })}
-              placeholder="Location name (e.g. Navami, Moodbidri)"
-              placeholderTextColor={colors.textSecondary}
-              style={[
-                styles.input,
-                {
-                  color: colors.text,
-                  borderColor: colors.border,
-                  backgroundColor: colors.surface,
-                  marginBottom: spacing.sm,
-                },
-              ]}
-            />
-            <LocationPicker
-              latitude={values.latitude}
-              longitude={values.longitude}
-              radiusMeters={values.radiusMeters}
-              onLocationChange={(latitude, longitude) =>
-                update({ latitude, longitude })
-              }
-              onRadiusChange={(radiusMeters) => update({ radiusMeters })}
-            />
-          </>
+          <LocationPicker
+            latitude={values.latitude}
+            longitude={values.longitude}
+            radiusMeters={values.radiusMeters}
+            locationName={values.locationName}
+            onLocationChange={(latitude, longitude) =>
+              update({ latitude, longitude })
+            }
+            onLocationNameChange={(locationName) => update({ locationName })}
+            onRadiusChange={(radiusMeters) => update({ radiusMeters })}
+          />
         ) : (
           <Text style={[styles.hint, { color: colors.textSecondary }]}>
             Remind when you arrive nearby
@@ -393,6 +386,9 @@ const styles = StyleSheet.create({
   pickerText: {
     ...typography.body,
     flex: 1,
+  },
+  iosDatePicker: {
+    height: 216,
   },
   triggerHeader: {
     flexDirection: "row",

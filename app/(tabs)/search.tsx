@@ -10,18 +10,18 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
-import { useTaskStore } from "@/lib/store/taskStore";
+import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
 export default function SearchScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [localQuery, setLocalQuery] = useState("");
   const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
-  const getFilteredTasks = useTaskStore((s) => s.getFilteredTasks);
   const toggleComplete = useTaskStore((s) => s.toggleComplete);
 
   const handleSearch = (query: string) => {
@@ -29,7 +29,7 @@ export default function SearchScreen() {
     setSearchQuery(query);
   };
 
-  const tasks = getFilteredTasks();
+  const tasks = useTaskStore(useShallow(selectFilteredTasks));
 
   return (
     <SafeAreaView

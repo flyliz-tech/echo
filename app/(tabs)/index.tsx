@@ -3,12 +3,13 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
-import { useTaskStore } from "@/lib/store/taskStore";
+import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -18,10 +19,8 @@ export default function HomeScreen() {
   const setSortMode = useTaskStore((s) => s.setSortMode);
   const searchQuery = useTaskStore((s) => s.searchQuery);
   const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
-  const getFilteredTasks = useTaskStore((s) => s.getFilteredTasks);
+  const tasks = useTaskStore(useShallow(selectFilteredTasks));
   const toggleComplete = useTaskStore((s) => s.toggleComplete);
-
-  const tasks = getFilteredTasks();
   const isSearching = searchFocused || searchQuery.length > 0;
 
   return (
@@ -48,14 +47,12 @@ export default function HomeScreen() {
           {
             backgroundColor: colors.surface,
             borderColor: isSearching ? colors.primary : colors.border,
-            borderWidth: isSearching ? 2 : 1,
-            paddingVertical: isSearching ? spacing.sm : spacing.xs,
           },
         ]}
       >
         <Ionicons
           name="search"
-          size={isSearching ? 20 : 18}
+          size={20}
           color={isSearching ? colors.primary : colors.textSecondary}
         />
         <TextInput
@@ -126,7 +123,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 12,
+    borderWidth: 1,
+    height: 52,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     gap: spacing.sm,
     marginBottom: spacing.md,
   },

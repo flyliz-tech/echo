@@ -34,16 +34,39 @@ export function circlePolygon(
   };
 }
 
-export function circleFeatureCollection(
+function hasValidInput(
+  longitude: number,
+  latitude: number,
+  radiusMeters: number
+): boolean {
+  return (
+    Number.isFinite(longitude) &&
+    Number.isFinite(latitude) &&
+    radiusMeters > 0
+  );
+}
+
+export function circlePolygonCollection(
   longitude: number,
   latitude: number,
   radiusMeters: number
 ): FeatureCollection {
-  if (
-    !Number.isFinite(longitude) ||
-    !Number.isFinite(latitude) ||
-    radiusMeters <= 0
-  ) {
+  if (!hasValidInput(longitude, latitude, radiusMeters)) {
+    return { type: "FeatureCollection", features: [] };
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [circlePolygon(longitude, latitude, radiusMeters)],
+  };
+}
+
+export function circleOutlineCollection(
+  longitude: number,
+  latitude: number,
+  radiusMeters: number
+): FeatureCollection {
+  if (!hasValidInput(longitude, latitude, radiusMeters)) {
     return { type: "FeatureCollection", features: [] };
   }
 
@@ -59,6 +82,6 @@ export function circleFeatureCollection(
 
   return {
     type: "FeatureCollection",
-    features: [polygon, outline],
+    features: [outline],
   };
 }
