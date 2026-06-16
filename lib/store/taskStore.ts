@@ -57,9 +57,10 @@ function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
-  return tasks
-    .filter((t) => !t.isCompleted)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const byNewest = (a: Task, b: Task) => b.createdAt.localeCompare(a.createdAt);
+  const incomplete = tasks.filter((t) => !t.isCompleted).sort(byNewest);
+  const completed = tasks.filter((t) => t.isCompleted).sort(byNewest);
+  return [...incomplete, ...completed];
 }
 
 function filterTasks(tasks: Task[], query: string): Task[] {
