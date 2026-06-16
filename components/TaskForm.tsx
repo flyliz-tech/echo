@@ -103,7 +103,9 @@ export function TaskForm({
           DateTimePickerAndroid.open({
             value: withDate,
             mode: "time",
-            is24Hour: true,
+            is24Hour: false,
+            design: "material",
+            initialInputMode: "keyboard",
             onChange: (timeEvent, selectedTime) => {
               if (timeEvent.type !== "set" || !selectedTime) return;
               const result = new Date(withDate);
