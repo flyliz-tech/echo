@@ -1,53 +1,92 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import { Platform, type ViewStyle } from "react-native";
 
-import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
+export const colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    background: "#F8F9FA",
+    surface: "#FFFFFF",
+    surfaceElevated: "#FFFFFF",
+    text: "#1A1A2E",
+    textSecondary: "#6B7280",
+    border: "#E5E7EB",
+    primary: "#2563EB",
+    primaryMuted: "#DBEAFE",
+    onPrimary: "#FFFFFF",
+    danger: "#DC2626",
+    dangerMuted: "#FEE2E2",
+    success: "#16A34A",
+    tabInactive: "#9CA3AF",
+    shadow: "rgba(0,0,0,0.08)",
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    background: "#0F0F14",
+    surface: "#1A1A24",
+    surfaceElevated: "#22222E",
+    text: "#F3F4F6",
+    textSecondary: "#9CA3AF",
+    border: "#2D2D3A",
+    primary: "#3B82F6",
+    primaryMuted: "#1E3A5F",
+    onPrimary: "#FFFFFF",
+    danger: "#EF4444",
+    dangerMuted: "#450A0A",
+    success: "#22C55E",
+    tabInactive: "#6B7280",
+    shadow: "rgba(0,0,0,0.3)",
   },
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+};
+
+export const radius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  full: 999,
+};
+
+export const typography = {
+  title: { fontSize: 22, fontWeight: "700" as const },
+  heading: { fontSize: 18, fontWeight: "600" as const },
+  body: { fontSize: 16, fontWeight: "400" as const },
+  caption: { fontSize: 13, fontWeight: "400" as const },
+  label: { fontSize: 14, fontWeight: "500" as const },
+};
+
+// Fixed dimensions for consistent, accessible touch targets and controls.
+export const layout = {
+  inputHeight: 52,
+  buttonHeight: 52,
+  controlHeight: 48,
+  minTouchTarget: 44,
+};
+
+// Subtle, theme-agnostic elevation presets. Pair `shadowColor` with a theme
+// token (colors.shadow) at call sites if a tinted shadow is desired.
+export const shadow: { sm: ViewStyle; md: ViewStyle } = {
+  sm: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 3,
+    },
+    android: { elevation: 1 },
+    default: {},
+  }) as ViewStyle,
+  md: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+    },
+    android: { elevation: 4 },
+    default: {},
+  }) as ViewStyle,
+};

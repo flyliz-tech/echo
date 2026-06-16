@@ -1,98 +1,231 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { ScreenHeader } from "@/components/ScreenHeader";
+import { SearchBar } from "@/components/SearchBar";
+import { TaskCard } from "@/components/TaskCard";
+import { TaskSortToggle } from "@/components/TaskSortToggle";
+import { useTheme } from "@/hooks/useTheme";
+import { radius, spacing, typography } from "@/constants/theme";
+import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const { colors } = useTheme();
+  const [searchFocused, setSearchFocused] = useState(false);
+  const sortMode = useTaskStore((s) => s.sortMode);
+  const setSortMode = useTaskStore((s) => s.setSortMode);
+  const searchQuery = useTaskStore((s) => s.searchQuery);
+  const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
+  const tasks = useTaskStore(useShallow(selectFilteredTasks));
+  const toggleComplete = useTaskStore((s) => s.toggleComplete);
+  const deleteTasks = useTaskStore((s) => s.deleteTasks);
+  const isSearching = searchFocused || searchQuery.length > 0;
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const enterSelection = (id: string) => {
+    setSelectionMode(true);
+    setSelectedIds(new Set([id]));
+  };
+
+  const exitSelection = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const allSelected = tasks.length > 0 && selectedIds.size === tasks.length;
+
+  const toggleSelectAll = () => {
+    setSelectedIds(allSelected ? new Set() : new Set(tasks.map((t) => t.id)));
+  };
+
+  const confirmDelete = () => {
+    if (selectedIds.size === 0) return;
+    const count = selectedIds.size;
+    Alert.alert(
+      "Delete tasks",
+      `Delete ${count} selected task${count > 1 ? "s" : ""}?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteTasks([...selectedIds]);
+            exitSelection();
+          },
+        },
+      ]
+    );
+  };
+
+  return (
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["bottom"]}
+    >
+      {selectionMode ? (
+        <ScreenHeader
+          title={`${selectedIds.size} selected`}
+          left={
+            <Pressable
+              onPress={exitSelection}
+              hitSlop={8}
+              accessibilityLabel="Cancel selection"
+            >
+              <Ionicons name="close" size={24} color={colors.text} />
+            </Pressable>
+          }
+          right={
+            <>
+              <Pressable
+                onPress={toggleSelectAll}
+                hitSlop={8}
+                accessibilityLabel="Select all"
+              >
+                <Ionicons
+                  name={allSelected ? "checkbox" : "square-outline"}
+                  size={24}
+                  color={colors.primary}
+                />
+              </Pressable>
+              <Pressable
+                onPress={confirmDelete}
+                hitSlop={8}
+                accessibilityLabel="Delete selected"
+              >
+                <Ionicons name="trash-outline" size={24} color={colors.danger} />
+              </Pressable>
+            </>
+          }
+        />
+      ) : (
+        <ScreenHeader
+          title="Echo"
+          right={
+            <Pressable
+              onPress={() => router.push("/settings")}
+              hitSlop={8}
+              accessibilityLabel="Settings"
+            >
+              <Ionicons name="settings-outline" size={24} color={colors.text} />
+            </Pressable>
+          }
+        />
+      )}
+
+      {!selectionMode && (
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          active={isSearching}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
+        />
+      )}
+
+      {!selectionMode && !isSearching && (
+        <TaskSortToggle value={sortMode} onChange={setSortMode} />
+      )}
+
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            {searchQuery ? (
+              <Ionicons
+                name="search-outline"
+                size={48}
+                color={colors.textSecondary}
+                style={styles.emptyIcon}
+              />
+            ) : (
+              <Image
+                source={require("@/assets/images/icon.png")}
+                style={styles.emptyLogo}
+              />
+            )}
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              {searchQuery ? "No matching tasks" : "No tasks yet"}
+            </Text>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              {searchQuery
+                ? "Try a different search term"
+                : "Tap the + tab to create your first reminder"}
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <TaskCard
+            task={item}
+            selectionMode={selectionMode}
+            selected={selectedIds.has(item.id)}
+            onPress={() =>
+              selectionMode
+                ? toggleSelect(item.id)
+                : router.push(`/task/${item.id}`)
+            }
+            onLongPress={() => {
+              if (!selectionMode) enterSelection(item.id);
+            }}
+            onToggleComplete={() => toggleComplete(item.id)}
+          />
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    paddingHorizontal: spacing.md,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  list: {
+    paddingBottom: spacing.lg,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  empty: {
+    paddingTop: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
+    alignItems: "center",
+  },
+  emptyIcon: {
+    marginBottom: spacing.md,
+    opacity: 0.7,
+  },
+  emptyLogo: {
+    width: 72,
+    height: 72,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
+  },
+  emptyTitle: {
+    ...typography.heading,
+    marginBottom: spacing.xs,
+    textAlign: "center",
+  },
+  emptyText: {
+    ...typography.body,
+    textAlign: "center",
   },
 });

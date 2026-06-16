@@ -1,0 +1,11 @@
+node_modules/
+android/
+.expo/
+.git/
+graphify-out/
+app/graphify-out/
+Docs/
+*.apk
+*.aab
+build/
+dist/
