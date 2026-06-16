@@ -115,12 +115,17 @@ export function TaskForm({
             selectedDate.getDate()
           );
 
+          // NOTE: do NOT pass `design: "material"` / `initialInputMode` here.
+          // Those route to the Material 3 MaterialTimePicker, which requires the
+          // host Activity theme to descend from Theme.MaterialComponents/Material3.
+          // This app uses Theme.AppCompat.DayNight.NoActionBar, so the Material
+          // picker throws IllegalArgumentException on the UI thread (uncatchable
+          // by the JS try/catch) and hard-crashes. The default AppCompat picker
+          // still supports AM/PM via is24Hour:false and a keyboard-entry toggle.
           DateTimePickerAndroid.open({
             value: withDate,
             mode: "time",
             is24Hour: false,
-            design: "material",
-            initialInputMode: "keyboard",
             onChange: (timeEvent, selectedTime) => {
               if (timeEvent.type !== "set" || !selectedTime) return;
               const result = new Date(withDate);
