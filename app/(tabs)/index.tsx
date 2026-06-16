@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
+import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
 import { useTheme } from "@/hooks/useTheme";
@@ -41,41 +42,19 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <View
-        style={[
-          styles.searchBar,
-          {
-            backgroundColor: colors.surface,
-            borderColor: isSearching ? colors.primary : colors.border,
-          },
-        ]}
-      >
-        <Ionicons
-          name="search"
-          size={20}
-          color={isSearching ? colors.primary : colors.textSecondary}
-        />
-        <TextInput
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-          placeholder="Search by task, location, notes"
-          placeholderTextColor={colors.textSecondary}
-          style={[styles.searchInput, { color: colors.text }]}
-        />
-        {searchQuery.length > 0 && (
-          <Pressable onPress={() => setSearchQuery("")}>
-            <Ionicons name="close" size={22} color={colors.textSecondary} />
-          </Pressable>
-        )}
-      </View>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        active={isSearching}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setSearchFocused(false)}
+      />
 
       {!isSearching && (
         <>
-          <Text style={[styles.sortLabel, { color: colors.textSecondary }]}>
-            Sort task
-          </Text>
+          {/* <Text style={[styles.sortLabel, { color: colors.textSecondary }]}>
+            Sort task by:
+          </Text> */}
           <TaskSortToggle value={sortMode} onChange={setSortMode} />
         </>
       )}
@@ -118,23 +97,6 @@ const styles = StyleSheet.create({
   title: {
     ...typography.title,
     fontSize: 20,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 52,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  searchInput: {
-    flex: 1,
-    ...typography.body,
-    fontSize: 15,
-    paddingVertical: 0,
   },
   sortLabel: {
     ...typography.caption,

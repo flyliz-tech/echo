@@ -6,8 +6,8 @@ import { SortMode } from "@/lib/types/task";
 
 const SORT_OPTIONS: { mode: SortMode; label: string }[] = [
   { mode: "default", label: "All" },
-  { mode: "triggerTime", label: "By trigger time" },
-  { mode: "location", label: "By location" },
+  { mode: "triggerTime", label: "Date & Time" },
+  { mode: "location", label: "Location" },
   { mode: "showCompleted", label: "Completed" },
 ];
 

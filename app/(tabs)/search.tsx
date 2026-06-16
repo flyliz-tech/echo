@@ -1,17 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
+import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
@@ -36,32 +29,12 @@ export default function SearchScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={["bottom"]}
     >
-      <View
-        style={[
-          styles.searchBar,
-          { backgroundColor: colors.surface, borderColor: colors.primary },
-        ]}
-      >
-        <Ionicons name="search" size={20} color={colors.primary} />
-        <TextInput
-          value={localQuery}
-          onChangeText={handleSearch}
-          placeholder="Search by task, location, notes"
-          placeholderTextColor={colors.textSecondary}
-          autoFocus
-          style={[styles.searchInput, { color: colors.text }]}
-        />
-        {localQuery.length > 0 && (
-          <Pressable
-            onPress={() => {
-              setLocalQuery("");
-              setSearchQuery("");
-            }}
-          >
-            <Ionicons name="close" size={22} color={colors.textSecondary} />
-          </Pressable>
-        )}
-      </View>
+      <SearchBar
+        value={localQuery}
+        onChangeText={handleSearch}
+        active
+        autoFocus
+      />
 
       <FlatList
         data={tasks}
@@ -90,22 +63,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.md,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  searchInput: {
-    flex: 1,
-    ...typography.body,
-    fontSize: 16,
-    paddingVertical: 0,
   },
   list: {
     paddingBottom: spacing.lg,
