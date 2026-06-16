@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
@@ -10,7 +10,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
 import { useTheme } from "@/hooks/useTheme";
-import { spacing, typography } from "@/constants/theme";
+import { radius, spacing, typography } from "@/constants/theme";
 import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
@@ -152,12 +152,19 @@ export default function HomeScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons
-              name={searchQuery ? "search-outline" : "checkmark-done-circle-outline"}
-              size={48}
-              color={colors.textSecondary}
-              style={styles.emptyIcon}
-            />
+            {searchQuery ? (
+              <Ionicons
+                name="search-outline"
+                size={48}
+                color={colors.textSecondary}
+                style={styles.emptyIcon}
+              />
+            ) : (
+              <Image
+                source={require("@/assets/images/icon.png")}
+                style={styles.emptyLogo}
+              />
+            )}
             <Text style={[styles.emptyTitle, { color: colors.text }]}>
               {searchQuery ? "No matching tasks" : "No tasks yet"}
             </Text>
@@ -205,6 +212,12 @@ const styles = StyleSheet.create({
   emptyIcon: {
     marginBottom: spacing.md,
     opacity: 0.7,
+  },
+  emptyLogo: {
+    width: 72,
+    height: 72,
+    borderRadius: radius.lg,
+    marginBottom: spacing.md,
   },
   emptyTitle: {
     ...typography.heading,

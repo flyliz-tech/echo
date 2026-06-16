@@ -16,6 +16,7 @@ export default function SearchScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [localQuery, setLocalQuery] = useState("");
+  const [focused, setFocused] = useState(false);
   const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
   const toggleComplete = useTaskStore((s) => s.toggleComplete);
 
@@ -36,7 +37,9 @@ export default function SearchScreen() {
       <SearchBar
         value={localQuery}
         onChangeText={handleSearch}
-        active
+        active={focused || localQuery.length > 0}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       />
 
       <FlatList

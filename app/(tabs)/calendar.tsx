@@ -208,10 +208,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   dot: {
+    position: "absolute",
+    bottom: 6,
     width: 5,
     height: 5,
     borderRadius: 3,
-    marginTop: 2,
   },
   sectionTitle: {
     ...typography.heading,

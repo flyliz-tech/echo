@@ -104,7 +104,12 @@ export default function MapTabScreenMapLibre() {
 
   return (
     <View style={styles.container}>
-      <Map style={styles.map} mapStyle={MAP_STYLE_URL}>
+      <Map
+        style={styles.map}
+        mapStyle={MAP_STYLE_URL}
+        logo={false}
+        attribution={false}
+      >
         <Camera ref={cameraRef} initialViewState={initialViewState} />
         {userLocation && (
           <Marker id="user-location" lngLat={userLocation} anchor="center">

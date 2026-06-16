@@ -80,6 +80,8 @@ function MapArea({
       <Map
         style={mapStyle}
         mapStyle={MAP_STYLE_URL}
+        logo={false}
+        attribution={false}
         onPress={(event) => {
           const [lng, lat] = event.nativeEvent.lngLat;
           onPick(lat, lng);

@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   field: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   label: {
     ...typography.label,
@@ -428,7 +428,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    minHeight: layout.minTouchTarget,
     marginBottom: spacing.xs,
   },
   hint: {

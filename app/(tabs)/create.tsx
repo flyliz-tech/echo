@@ -1,7 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -30,18 +29,7 @@ export default function CreateTaskScreen() {
       edges={["bottom"]}
     >
       <View style={styles.headerPad}>
-        <ScreenHeader
-          title="Create Task"
-          left={
-            <Pressable
-              onPress={() => router.replace("/(tabs)")}
-              hitSlop={8}
-              accessibilityLabel="Back"
-            >
-              <Ionicons name="arrow-back" size={24} color={colors.text} />
-            </Pressable>
-          }
-        />
+        <ScreenHeader title="Create Task" />
       </View>
 
       <TaskForm
