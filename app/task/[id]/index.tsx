@@ -75,13 +75,15 @@ export default function ViewTaskScreen() {
         )}
 
         <View style={styles.actions}>
-          <Pressable
-            onPress={() => router.push(`/task/${task.id}/edit`)}
-            style={[styles.button, { backgroundColor: colors.primary }]}
-          >
-            <Ionicons name="create-outline" size={20} color="#FFFFFF" />
-            <Text style={styles.buttonText}>Edit</Text>
-          </Pressable>
+          {!task.isCompleted && (
+            <Pressable
+              onPress={() => router.push(`/task/${task.id}/edit`)}
+              style={[styles.button, { backgroundColor: colors.primary }]}
+            >
+              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.buttonText}>Edit</Text>
+            </Pressable>
+          )}
           <Pressable
             onPress={handleDelete}
             style={[styles.button, { backgroundColor: colors.dangerMuted, borderColor: colors.danger, borderWidth: 1 }]}

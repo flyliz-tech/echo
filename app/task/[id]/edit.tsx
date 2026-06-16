@@ -35,6 +35,16 @@ export default function EditTaskScreen() {
     );
   }
 
+  if (task.isCompleted) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: colors.textSecondary }}>
+          Completed tasks can&apos;t be edited
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <TaskForm
       initialValues={taskToFormValues(task)}
