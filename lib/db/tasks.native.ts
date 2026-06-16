@@ -180,30 +180,3 @@ export async function deleteTask(id: string): Promise<void> {
   const db = await getDatabase();
   await db.runAsync("DELETE FROM tasks WHERE id = ?", [id]);
 }
-
-export async function seedDevTasks(): Promise<void> {
-  const existing = await getAllTasks();
-  if (existing.length > 0) return;
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(18, 30, 0, 0);
-
-  await createTask({
-    title: "Buy Milk",
-    notes: "Nandini 1 ltr",
-    triggerType: "time",
-    timeEnabled: true,
-    triggerTime: tomorrow.toISOString(),
-  });
-
-  await createTask({
-    title: "Collect Laundry Clothes",
-    notes: "List articles when collecting",
-    triggerType: "location",
-    locationName: "Evershine Laundry, Moodbidri",
-    latitude: 13.064,
-    longitude: 74.997,
-    radiusMeters: 150,
-  });
-}

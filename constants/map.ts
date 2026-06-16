@@ -6,6 +6,9 @@ export const DEFAULT_CENTER = {
   longitude: 74.9982,
 } as const;
 
+/** Street-level zoom used when recentering on the user's current location. */
+export const RECENTER_ZOOM = 15;
+
 /** Approximate MapLibre zoom from react-native-maps latitudeDelta. */
 export function latitudeDeltaToZoom(latitudeDelta: number): number {
   return Math.log2(360 / latitudeDelta) - 1;

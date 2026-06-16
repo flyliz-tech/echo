@@ -97,7 +97,6 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     if (get().isInitialized) return;
     set({ isLoading: true });
     try {
-      await taskDb.seedDevTasks();
       const tasks = await taskDb.getAllTasks();
       set({ tasks, isInitialized: true });
       await syncTriggers();

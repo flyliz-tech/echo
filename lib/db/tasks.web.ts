@@ -99,29 +99,3 @@ export async function deleteTask(id: string): Promise<void> {
   const index = tasks.findIndex((task) => task.id === id);
   if (index !== -1) tasks.splice(index, 1);
 }
-
-export async function seedDevTasks(): Promise<void> {
-  if (tasks.length > 0) return;
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(18, 30, 0, 0);
-
-  await createTask({
-    title: "Buy Milk",
-    notes: "Nandini 1 ltr",
-    triggerType: "time",
-    timeEnabled: true,
-    triggerTime: tomorrow.toISOString(),
-  });
-
-  await createTask({
-    title: "Collect Laundry Clothes",
-    notes: "List articles when collecting",
-    triggerType: "location",
-    locationName: "Evershine Laundry, Moodbidri",
-    latitude: 13.064,
-    longitude: 74.997,
-    radiusMeters: 150,
-  });
-}
