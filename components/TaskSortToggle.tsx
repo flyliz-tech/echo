@@ -32,6 +32,7 @@ export function TaskSortToggle({ value, onChange }: TaskSortToggleProps) {
               {
                 backgroundColor: active ? colors.primaryMuted : colors.surface,
                 borderColor: active ? colors.primary : colors.border,
+                borderWidth: active ? 1.5 : 1,
               },
             ]}
           >
@@ -57,10 +58,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   chip: {
+    minHeight: 40,
+    justifyContent: "center",
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
     borderRadius: radius.full,
-    borderWidth: 1,
   },
   label: {
     ...typography.label,

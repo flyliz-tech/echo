@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -44,6 +45,12 @@ export default function SearchScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
+            <Ionicons
+              name="search-outline"
+              size={48}
+              color={colors.textSecondary}
+              style={styles.emptyIcon}
+            />
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               {localQuery ? "No matching tasks" : "Start typing to search"}
             </Text>
@@ -70,10 +77,15 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   empty: {
-    paddingTop: spacing.xl,
+    paddingTop: spacing.xl * 2,
     alignItems: "center",
+  },
+  emptyIcon: {
+    marginBottom: spacing.md,
+    opacity: 0.7,
   },
   emptyText: {
     ...typography.body,
+    textAlign: "center",
   },
 });

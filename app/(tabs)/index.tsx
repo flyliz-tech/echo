@@ -152,8 +152,19 @@ export default function HomeScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
+            <Ionicons
+              name={searchQuery ? "search-outline" : "checkmark-done-circle-outline"}
+              size={48}
+              color={colors.textSecondary}
+              style={styles.emptyIcon}
+            />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+              {searchQuery ? "No matching tasks" : "No tasks yet"}
+            </Text>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              {searchQuery ? "No matching tasks" : "No tasks yet. Tap + to create one."}
+              {searchQuery
+                ? "Try a different search term"
+                : "Tap the + tab to create your first reminder"}
             </Text>
           </View>
         }
@@ -187,8 +198,18 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   empty: {
-    paddingTop: spacing.xl,
+    paddingTop: spacing.xl * 2,
+    paddingHorizontal: spacing.lg,
     alignItems: "center",
+  },
+  emptyIcon: {
+    marginBottom: spacing.md,
+    opacity: 0.7,
+  },
+  emptyTitle: {
+    ...typography.heading,
+    marginBottom: spacing.xs,
+    textAlign: "center",
   },
   emptyText: {
     ...typography.body,

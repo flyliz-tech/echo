@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { radius, shadow, spacing, typography } from "@/constants/theme";
 import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 
@@ -29,9 +29,12 @@ export function TaskCard({
     <View
       style={[
         styles.card,
+        !task.isCompleted && shadow.sm,
         {
           backgroundColor: selected ? colors.primaryMuted : colors.surface,
           borderColor: selected ? colors.primary : colors.border,
+          borderWidth: selected ? 1.5 : 1,
+          shadowColor: colors.shadow,
           opacity: task.isCompleted && !selected ? 0.6 : 1,
         },
       ]}

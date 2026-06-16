@@ -26,7 +26,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
-import { spacing, typography } from "@/constants/theme";
+import { radius, spacing, typography } from "@/constants/theme";
 import { hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -107,6 +107,7 @@ export default function CalendarScreen() {
           const key = format(day, "yyyy-MM-dd");
           const inMonth = isSameMonth(day, currentMonth);
           const selected = isSameDay(day, selectedDate);
+          const isToday = isSameDay(day, new Date());
           const hasTasks = daysWithTasks.has(key);
 
           return (
@@ -116,6 +117,7 @@ export default function CalendarScreen() {
               style={[
                 styles.dayCell,
                 selected && { backgroundColor: colors.primaryMuted },
+                isToday && !selected && { borderWidth: 1, borderColor: colors.primary },
               ]}
             >
               <Text
@@ -125,7 +127,7 @@ export default function CalendarScreen() {
                     color: inMonth ? colors.text : colors.textSecondary,
                     opacity: inMonth ? 1 : 0.4,
                   },
-                  selected && { color: colors.primary, fontWeight: "700" },
+                  (selected || isToday) && { color: colors.primary, fontWeight: "700" },
                 ]}
               >
                 {format(day, "d")}
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   dayText: {
     ...typography.body,
@@ -212,7 +214,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   sectionTitle: {
-    ...typography.label,
+    ...typography.heading,
+    fontSize: 16,
+    marginTop: spacing.xs,
     marginBottom: spacing.sm,
   },
   list: {

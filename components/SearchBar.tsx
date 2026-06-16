@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Pressable, TextInput, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
-import { spacing, typography } from "@/constants/theme";
+import { layout, radius, spacing, typography } from "@/constants/theme";
 
 interface SearchBarProps {
   value: string;
@@ -32,6 +32,7 @@ export function SearchBar({
         {
           backgroundColor: colors.surface,
           borderColor: active ? colors.primary : colors.border,
+          borderWidth: active ? 1.5 : 1,
         },
       ]}
     >
@@ -63,18 +64,15 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 12,
-    borderWidth: 1,
-    height: 52,
+    borderRadius: radius.md,
+    height: layout.inputHeight,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
   searchInput: {
     flex: 1,
     ...typography.body,
-    fontSize: 15,
     paddingVertical: 0,
   },
 });

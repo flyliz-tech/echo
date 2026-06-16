@@ -11,7 +11,6 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -21,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MapPin } from "@/components/MapPin";
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import {
   DEFAULT_CENTER,
   latitudeDeltaToZoom,
@@ -109,8 +108,8 @@ export default function MapTabScreenMapLibre() {
         <Camera ref={cameraRef} initialViewState={initialViewState} />
         {userLocation && (
           <Marker id="user-location" lngLat={userLocation} anchor="center">
-            <View style={styles.userDotRing}>
-              <View style={styles.userDot} />
+            <View style={[styles.userDotRing, { backgroundColor: colors.primaryMuted }]}>
+              <View style={[styles.userDot, { backgroundColor: colors.primary }]} />
             </View>
           </Marker>
         )}
@@ -155,7 +154,9 @@ export default function MapTabScreenMapLibre() {
               }}
               style={[styles.viewButton, { backgroundColor: colors.primary }]}
             >
-              <Text style={styles.viewButtonText}>View task</Text>
+              <Text style={[styles.viewButtonText, { color: colors.onPrimary }]}>
+                View task
+              </Text>
             </Pressable>
           </View>
         </SafeAreaView>
@@ -208,15 +209,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: radius.md,
     padding: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: { elevation: 4 },
-    }),
+    ...shadow.md,
   },
   tooltipTitle: {
     ...typography.heading,
@@ -228,12 +221,12 @@ const styles = StyleSheet.create({
   },
   viewButton: {
     marginTop: spacing.sm,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.sm,
+    minHeight: layout.minTouchTarget,
+    justifyContent: "center",
+    borderRadius: radius.md,
     alignItems: "center",
   },
   viewButtonText: {
-    color: "#FFFFFF",
     ...typography.label,
     fontWeight: "600",
   },
@@ -243,8 +236,9 @@ const styles = StyleSheet.create({
     left: spacing.md,
     right: spacing.md,
     padding: spacing.md,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     alignItems: "center",
+    ...shadow.sm,
   },
   emptyText: {
     ...typography.caption,
@@ -259,15 +253,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-      },
-      android: { elevation: 4 },
-    }),
+    ...shadow.md,
   },
   userDotRing: {
     width: 22,
@@ -275,13 +261,11 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(37, 99, 235, 0.2)",
   },
   userDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#2563EB",
     borderWidth: 2,
     borderColor: "#FFFFFF",
   },

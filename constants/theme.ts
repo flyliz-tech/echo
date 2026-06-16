@@ -1,12 +1,16 @@
+import { Platform, type ViewStyle } from "react-native";
+
 export const colors = {
   light: {
     background: "#F8F9FA",
     surface: "#FFFFFF",
+    surfaceElevated: "#FFFFFF",
     text: "#1A1A2E",
     textSecondary: "#6B7280",
     border: "#E5E7EB",
     primary: "#2563EB",
     primaryMuted: "#DBEAFE",
+    onPrimary: "#FFFFFF",
     danger: "#DC2626",
     dangerMuted: "#FEE2E2",
     success: "#16A34A",
@@ -16,11 +20,13 @@ export const colors = {
   dark: {
     background: "#0F0F14",
     surface: "#1A1A24",
+    surfaceElevated: "#22222E",
     text: "#F3F4F6",
     textSecondary: "#9CA3AF",
     border: "#2D2D3A",
     primary: "#3B82F6",
     primaryMuted: "#1E3A5F",
+    onPrimary: "#FFFFFF",
     danger: "#EF4444",
     dangerMuted: "#450A0A",
     success: "#22C55E",
@@ -50,4 +56,37 @@ export const typography = {
   body: { fontSize: 16, fontWeight: "400" as const },
   caption: { fontSize: 13, fontWeight: "400" as const },
   label: { fontSize: 14, fontWeight: "500" as const },
+};
+
+// Fixed dimensions for consistent, accessible touch targets and controls.
+export const layout = {
+  inputHeight: 52,
+  buttonHeight: 52,
+  controlHeight: 48,
+  minTouchTarget: 44,
+};
+
+// Subtle, theme-agnostic elevation presets. Pair `shadowColor` with a theme
+// token (colors.shadow) at call sites if a tinted shadow is desired.
+export const shadow: { sm: ViewStyle; md: ViewStyle } = {
+  sm: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 3,
+    },
+    android: { elevation: 1 },
+    default: {},
+  }) as ViewStyle,
+  md: Platform.select({
+    ios: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+    },
+    android: { elevation: 4 },
+    default: {},
+  }) as ViewStyle,
 };

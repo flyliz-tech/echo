@@ -98,7 +98,7 @@ function MapArea({
           <Layer
             id="picker-radius-fill-layer"
             type="fill"
-            paint={{ "fill-color": "#2563EB", "fill-opacity": 0.15 }}
+            paint={{ "fill-color": colors.primary, "fill-opacity": 0.15 }}
           />
         </GeoJSONSource>
         <GeoJSONSource id="picker-radius-outline" data={outlineData}>
@@ -106,7 +106,7 @@ function MapArea({
             id="picker-radius-line-layer"
             type="line"
             paint={{
-              "line-color": "#2563EB",
+              "line-color": colors.primary,
               "line-opacity": 0.5,
               "line-width": 2,
             }}
@@ -274,7 +274,9 @@ export function LocationPickerMapLibre(props: LocationPickerProps) {
               onPress={() => setIsFullscreen(false)}
               style={[styles.doneButton, { backgroundColor: colors.primary }]}
             >
-              <Text style={styles.doneButtonText}>Done</Text>
+              <Text style={[styles.doneButtonText, { color: colors.onPrimary }]}>
+                Done
+              </Text>
             </Pressable>
           </View>
           <View style={styles.fullscreenSearch}>
@@ -393,7 +395,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   doneButtonText: {
-    color: "#FFFFFF",
     ...typography.label,
     fontWeight: "600",
   },

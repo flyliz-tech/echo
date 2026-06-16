@@ -16,7 +16,7 @@ import {
 
 import { LocationPicker } from "@/components/LocationPicker";
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import {
   CreateTaskInput,
   NOTES_MAX_LENGTH,
@@ -56,6 +56,18 @@ const defaultValues: TaskFormValues = {
   radiusMeters: 150,
 };
 
+/**
+ * Normalizes a trigger time (which may arrive as a Date, an ISO string from
+ * persisted data, null, or an unparseable value) into a valid Date or null.
+ * The native DateTimePicker crashes if handed a string or an Invalid Date
+ * (NaN timestamp), so every value reaching the picker must pass through here.
+ */
+function toValidDate(value: Date | string | null | undefined): Date | null {
+  if (value == null) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export function TaskForm({
   initialValues,
   onSubmit,
@@ -63,9 +75,9 @@ export function TaskForm({
   submitLabel = "Save",
 }: TaskFormProps) {
   const { colors } = useTheme();
-  const [values, setValues] = useState<TaskFormValues>({
-    ...defaultValues,
-    ...initialValues,
+  const [values, setValues] = useState<TaskFormValues>(() => {
+    const merged = { ...defaultValues, ...initialValues };
+    return { ...merged, triggerTime: toValidDate(merged.triggerTime) };
   });
   const [error, setError] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -84,9 +96,12 @@ export function TaskForm({
     setError(null);
   };
 
+  // Always derive a guaranteed-valid Date for any picker/display usage.
+  const triggerDate = toValidDate(values.triggerTime);
+
   const openDateTimePicker = () => {
     if (Platform.OS === "android") {
-      const initial = values.triggerTime ?? new Date();
+      const initial = toValidDate(values.triggerTime) ?? new Date();
       DateTimePickerAndroid.open({
         value: initial,
         mode: "date",
@@ -179,7 +194,7 @@ export function TaskForm({
     >
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Enter title of task ({values.title.length}/{TITLE_MAX_LENGTH})
+          Title ({values.title.length}/{TITLE_MAX_LENGTH})
         </Text>
         <TextInput
           value={values.title}
@@ -213,7 +228,7 @@ export function TaskForm({
               }
               update({
                 timeEnabled: true,
-                triggerTime: values.triggerTime ?? new Date(),
+                triggerTime: toValidDate(values.triggerTime) ?? new Date(),
               });
             }}
             trackColor={{ false: colors.border, true: colors.primaryMuted }}
@@ -228,15 +243,15 @@ export function TaskForm({
             >
               <Ionicons name="calendar-outline" size={20} color={colors.primary} />
               <Text style={[styles.pickerText, { color: colors.text }]}>
-                {values.triggerTime
-                  ? values.triggerTime.toLocaleString()
+                {triggerDate
+                  ? triggerDate.toLocaleString()
                   : "Select date and time"}
               </Text>
             </Pressable>
             {showDatePicker && Platform.OS === "ios" && (
               <View style={styles.iosDatePicker}>
                 <DateTimePicker
-                  value={values.triggerTime ?? new Date()}
+                  value={triggerDate ?? new Date()}
                   mode="datetime"
                   display="spinner"
                   onChange={(_, date) => {
@@ -297,7 +312,7 @@ export function TaskForm({
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Add notes ({values.notes.length}/{NOTES_MAX_LENGTH})
+          Notes ({values.notes.length}/{NOTES_MAX_LENGTH})
         </Text>
         <TextInput
           value={values.notes}
@@ -327,7 +342,12 @@ export function TaskForm({
       <View style={styles.actions}>
         <Pressable
           onPress={onCancel}
-          style={[styles.button, styles.cancelButton, { borderColor: colors.border }]}
+          style={({ pressed }) => [
+            styles.button,
+            styles.cancelButton,
+            { borderColor: colors.border, backgroundColor: colors.surface },
+            pressed && styles.pressed,
+          ]}
         >
           <Text style={[styles.buttonText, { color: colors.textSecondary }]}>
             Cancel
@@ -336,13 +356,15 @@ export function TaskForm({
         <Pressable
           onPress={handleSubmit}
           disabled={isSubmitting}
-          style={[
+          style={({ pressed }) => [
             styles.button,
             styles.saveButton,
+            shadow.sm,
             { backgroundColor: colors.primary, opacity: isSubmitting ? 0.6 : 1 },
+            pressed && styles.pressed,
           ]}
         >
-          <Text style={[styles.buttonText, { color: "#FFFFFF" }]}>
+          <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
             {submitLabel}
           </Text>
         </Pressable>
@@ -360,30 +382,35 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   field: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   label: {
     ...typography.label,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
   },
   input: {
+    minHeight: layout.inputHeight,
     borderWidth: 1,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     ...typography.body,
   },
   notesInput: {
-    minHeight: 100,
-    paddingTop: spacing.sm,
+    minHeight: 120,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    lineHeight: 22,
   },
   pickerButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
+    minHeight: layout.controlHeight,
     borderWidth: 1,
-    borderRadius: radius.sm,
-    padding: spacing.md,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   pickerText: {
     ...typography.body,
@@ -396,6 +423,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    minHeight: layout.minTouchTarget,
     marginBottom: spacing.xs,
   },
   hint: {
@@ -408,17 +436,22 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   button: {
     flex: 1,
-    paddingVertical: spacing.md,
-    borderRadius: radius.sm,
+    minHeight: layout.buttonHeight,
+    justifyContent: "center",
+    borderRadius: radius.md,
     alignItems: "center",
   },
   cancelButton: {
     borderWidth: 1,
   },
   saveButton: {},
+  pressed: {
+    opacity: 0.85,
+  },
   buttonText: {
     ...typography.label,
     fontWeight: "600",

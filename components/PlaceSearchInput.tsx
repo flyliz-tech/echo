@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import { GeocodeResult, searchPlaces } from "@/lib/services/geocoding";
 
 interface PlaceSearchInputProps {
@@ -156,9 +156,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
     borderWidth: 1,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    height: 48,
+    height: layout.controlHeight,
   },
   input: {
     flex: 1,
@@ -167,15 +167,15 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: 52,
+    top: layout.controlHeight + spacing.xs,
     left: 0,
     right: 0,
     borderWidth: 1,
-    borderRadius: radius.sm,
+    borderRadius: radius.md,
     maxHeight: 240,
     overflow: "hidden",
     zIndex: 20,
-    elevation: 4,
+    ...shadow.md,
   },
   resultRow: {
     flexDirection: "row",

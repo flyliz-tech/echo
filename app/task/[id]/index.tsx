@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import { formatDateTime, formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
 import { hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
@@ -101,15 +101,30 @@ export default function ViewTaskScreen() {
           {!task.isCompleted && (
             <Pressable
               onPress={() => router.push(`/task/${task.id}/edit`)}
-              style={[styles.button, { backgroundColor: colors.primary }]}
+              style={({ pressed }) => [
+                styles.button,
+                shadow.sm,
+                { backgroundColor: colors.primary },
+                pressed && styles.pressed,
+              ]}
             >
-              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
-              <Text style={styles.buttonText}>Edit</Text>
+              <Ionicons name="create-outline" size={20} color={colors.onPrimary} />
+              <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
+                Edit
+              </Text>
             </Pressable>
           )}
           <Pressable
             onPress={handleDelete}
-            style={[styles.button, { backgroundColor: colors.dangerMuted, borderColor: colors.danger, borderWidth: 1 }]}
+            style={({ pressed }) => [
+              styles.button,
+              {
+                backgroundColor: colors.dangerMuted,
+                borderColor: colors.danger,
+                borderWidth: 1,
+              },
+              pressed && styles.pressed,
+            ]}
           >
             <Ionicons name="trash-outline" size={20} color={colors.danger} />
             <Text style={[styles.buttonText, { color: colors.danger }]}>Delete</Text>
@@ -184,12 +199,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.xs,
-    paddingVertical: spacing.md,
-    borderRadius: radius.sm,
+    minHeight: layout.buttonHeight,
+    borderRadius: radius.md,
   },
   buttonText: {
     ...typography.label,
     fontWeight: "600",
     color: "#FFFFFF",
+  },
+  pressed: {
+    opacity: 0.85,
   },
 });
