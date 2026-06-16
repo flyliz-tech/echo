@@ -5,8 +5,9 @@ import { radius, spacing, typography } from "@/constants/theme";
 import { SortMode } from "@/lib/types/task";
 
 const SORT_OPTIONS: { mode: SortMode; label: string }[] = [
-  { mode: "default", label: "Latest" },
+  { mode: "default", label: "All" },
   { mode: "triggerTime", label: "By trigger time" },
+  { mode: "location", label: "By location" },
   { mode: "showCompleted", label: "Completed" },
 ];
 

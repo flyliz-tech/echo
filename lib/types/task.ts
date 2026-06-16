@@ -1,6 +1,10 @@
 export type TriggerType = "location" | "time" | "both" | "none";
 
-export type SortMode = "default" | "triggerTime" | "showCompleted";
+export type SortMode =
+  | "default"
+  | "triggerTime"
+  | "location"
+  | "showCompleted";
 
 export interface Task {
   id: string;

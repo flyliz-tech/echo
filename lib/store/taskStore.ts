@@ -8,6 +8,7 @@ import {
   SortMode,
   Task,
   UpdateTaskInput,
+  hasLocationTrigger,
   hasTimeTrigger,
 } from "@/lib/types/task";
 
@@ -48,6 +49,12 @@ function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
     return tasks
       .filter((t) => !t.isCompleted && hasTimeTrigger(t) && t.triggerTime)
       .sort((a, b) => a.triggerTime!.localeCompare(b.triggerTime!));
+  }
+
+  if (sortMode === "location") {
+    return tasks
+      .filter((t) => !t.isCompleted && hasLocationTrigger(t))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
   return tasks
