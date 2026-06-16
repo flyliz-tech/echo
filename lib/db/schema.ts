@@ -1,5 +1,5 @@
 export const DB_NAME = "echo.db";
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const CREATE_TASKS_TABLE = `
   CREATE TABLE IF NOT EXISTS tasks (
@@ -47,4 +47,9 @@ export const MIGRATE_TASKS_V2 = `
   ALTER TABLE tasks_v2 RENAME TO tasks;
   ${CREATE_TASKS_INDEX}
   ${CREATE_TASKS_TRIGGER_TIME_INDEX}
+`;
+
+export const MIGRATE_TASKS_V3 = `
+  ALTER TABLE tasks ADD COLUMN updated_at TEXT;
+  UPDATE tasks SET updated_at = created_at WHERE updated_at IS NULL;
 `;

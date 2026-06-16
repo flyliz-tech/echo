@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
 import { radius, spacing, typography } from "@/constants/theme";
-import { formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
+import { formatDateTime, formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
 import { hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -74,6 +74,29 @@ export default function ViewTaskScreen() {
           </View>
         )}
 
+        <View style={styles.metaBox}>
+          <View style={styles.metaRow}>
+            <Ionicons
+              name="add-circle-outline"
+              size={16}
+              color={colors.textSecondary}
+            />
+            <Text style={[styles.metaText, { color: colors.textSecondary }]}>
+              Created {formatDateTime(task.createdAt)}
+            </Text>
+          </View>
+          <View style={styles.metaRow}>
+            <Ionicons
+              name="create-outline"
+              size={16}
+              color={colors.textSecondary}
+            />
+            <Text style={[styles.metaText, { color: colors.textSecondary }]}>
+              Modified {formatDateTime(task.updatedAt)}
+            </Text>
+          </View>
+        </View>
+
         <View style={styles.actions}>
           {!task.isCompleted && (
             <Pressable
@@ -138,10 +161,22 @@ const styles = StyleSheet.create({
     ...typography.body,
     lineHeight: 22,
   },
+  metaBox: {
+    marginTop: spacing.sm,
+    gap: spacing.xs,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  metaText: {
+    ...typography.caption,
+  },
   actions: {
     flexDirection: "row",
     gap: spacing.sm,
-    marginTop: spacing.md,
+    marginTop: spacing.lg,
   },
   button: {
     flex: 1,

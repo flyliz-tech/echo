@@ -17,3 +17,7 @@ export function formatTriggerTimeFull(isoString: string): string {
 export function formatCalendarDay(isoString: string): string {
   return format(parseISO(isoString), "yyyy-MM-dd");
 }
+
+export function formatDateTime(isoString: string): string {
+  return format(parseISO(isoString), "MMM d, yyyy · h:mm a");
+}

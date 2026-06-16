@@ -22,6 +22,7 @@ interface TaskRow {
   trigger_time: string | null;
   is_completed: number;
   created_at: string;
+  updated_at: string | null;
 }
 
 function rowToTask(row: TaskRow): Task {
@@ -37,6 +38,7 @@ function rowToTask(row: TaskRow): Task {
     triggerTime: row.trigger_time,
     isCompleted: row.is_completed === 1,
     createdAt: row.created_at,
+    updatedAt: row.updated_at ?? row.created_at,
   };
 }
 
@@ -76,13 +78,14 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     triggerTime: triggerFields.triggerTime,
     isCompleted: false,
     createdAt: now,
+    updatedAt: now,
   };
 
   await db.runAsync(
     `INSERT INTO tasks (
       id, title, notes, trigger_type, latitude, longitude,
-      radius_meters, location_name, trigger_time, is_completed, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      radius_meters, location_name, trigger_time, is_completed, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       task.id,
       task.title,
@@ -95,6 +98,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
       task.triggerTime,
       task.isCompleted ? 1 : 0,
       task.createdAt,
+      task.updatedAt,
     ]
   );
 
@@ -144,13 +148,15 @@ export async function updateTask(
     triggerTime: triggerFields.triggerTime,
     isCompleted: input.isCompleted ?? existing.isCompleted,
     triggerType,
+    updatedAt: new Date().toISOString(),
   };
 
   const db = await getDatabase();
   await db.runAsync(
     `UPDATE tasks SET
       title = ?, notes = ?, trigger_type = ?, latitude = ?, longitude = ?,
-      radius_meters = ?, location_name = ?, trigger_time = ?, is_completed = ?
+      radius_meters = ?, location_name = ?, trigger_time = ?, is_completed = ?,
+      updated_at = ?
     WHERE id = ?`,
     [
       merged.title,
@@ -162,6 +168,7 @@ export async function updateTask(
       merged.locationName,
       merged.triggerTime,
       merged.isCompleted ? 1 : 0,
+      merged.updatedAt,
       id,
     ]
   );

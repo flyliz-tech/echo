@@ -37,6 +37,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     triggerTime: triggerFields.triggerTime,
     isCompleted: false,
     createdAt: now,
+    updatedAt: now,
   };
 
   tasks.unshift(task);
@@ -87,6 +88,7 @@ export async function updateTask(
     triggerTime: triggerFields.triggerTime,
     isCompleted: input.isCompleted ?? existing.isCompleted,
     triggerType,
+    updatedAt: new Date().toISOString(),
   };
 
   tasks[index] = merged;

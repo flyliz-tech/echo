@@ -6,6 +6,7 @@ import {
   CREATE_TASKS_TRIGGER_TIME_INDEX,
   DB_NAME,
   MIGRATE_TASKS_V2,
+  MIGRATE_TASKS_V3,
   SCHEMA_VERSION,
 } from "./schema";
 
@@ -38,6 +39,13 @@ async function migrate(database: SQLite.SQLiteDatabase): Promise<void> {
     await database.execAsync(`
       ${MIGRATE_TASKS_V2}
       PRAGMA user_version = 2;
+    `);
+  }
+
+  if (currentVersion < 3) {
+    await database.execAsync(`
+      ${MIGRATE_TASKS_V3}
+      PRAGMA user_version = 3;
     `);
   }
 }

@@ -18,6 +18,7 @@ export interface Task {
   triggerTime: string | null;
   isCompleted: boolean;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTaskInput {
