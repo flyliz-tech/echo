@@ -114,24 +114,34 @@ export default function CalendarScreen() {
             <Pressable
               key={key}
               onPress={() => setSelectedDate(day)}
-              style={[
-                styles.dayCell,
-                selected && { backgroundColor: colors.primaryMuted },
-                isToday && !selected && { borderWidth: 1, borderColor: colors.primary },
-              ]}
+              style={styles.dayCell}
             >
-              <Text
+              <View
                 style={[
-                  styles.dayText,
-                  {
-                    color: inMonth ? colors.text : colors.textSecondary,
-                    opacity: inMonth ? 1 : 0.4,
+                  styles.dayInner,
+                  selected && { backgroundColor: colors.primaryMuted },
+                  isToday && !selected && {
+                    borderWidth: 1,
+                    borderColor: colors.primary,
                   },
-                  (selected || isToday) && { color: colors.primary, fontWeight: "700" },
                 ]}
               >
-                {format(day, "d")}
-              </Text>
+                <Text
+                  style={[
+                    styles.dayText,
+                    {
+                      color: inMonth ? colors.text : colors.textSecondary,
+                      opacity: inMonth ? 1 : 0.4,
+                    },
+                    (selected || isToday) && {
+                      color: colors.primary,
+                      fontWeight: "700",
+                    },
+                  ]}
+                >
+                  {format(day, "d")}
+                </Text>
+              </View>
               {hasTasks && (
                 <View
                   style={[styles.dot, { backgroundColor: colors.primary }]}
@@ -201,15 +211,26 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: radius.sm,
+  },
+  dayInner: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.full,
+    alignItems: "center",
+    justifyContent: "center",
   },
   dayText: {
     ...typography.body,
     fontSize: 15,
+    lineHeight: 18,
+    textAlign: "center",
+    textAlignVertical: "center",
+    includeFontPadding: false,
   },
   dot: {
     position: "absolute",
-    bottom: 6,
+    bottom: 4,
+    alignSelf: "center",
     width: 5,
     height: 5,
     borderRadius: 3,
