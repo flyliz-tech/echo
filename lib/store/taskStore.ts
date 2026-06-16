@@ -34,6 +34,7 @@ export interface TaskStore {
   updateTask: (id: string, input: UpdateTaskInput) => Promise<Task | null>;
   toggleComplete: (id: string) => Promise<void>;
   deleteTaskWithUndo: (id: string) => Promise<void>;
+  deleteTasks: (ids: string[]) => Promise<void>;
   undoDelete: () => Promise<void>;
   getTaskById: (id: string) => Task | undefined;
 }
@@ -154,6 +155,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }, 10000);
 
     set({ pendingDelete: { task, timeoutId } });
+  },
+
+  deleteTasks: async (ids) => {
+    if (ids.length === 0) return;
+    const idSet = new Set(ids);
+
+    const existing = get().pendingDelete;
+    if (existing) {
+      clearTimeout(existing.timeoutId);
+      idSet.add(existing.task.id);
+      set({ pendingDelete: null });
+    }
+
+    set({ tasks: get().tasks.filter((t) => !idSet.has(t.id)) });
+    await Promise.all([...idSet].map((id) => taskDb.deleteTask(id)));
+    await syncTriggers();
   },
 
   undoDelete: async () => {

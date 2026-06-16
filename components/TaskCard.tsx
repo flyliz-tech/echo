@@ -10,9 +10,19 @@ interface TaskCardProps {
   task: Task;
   onPress: () => void;
   onToggleComplete: () => void;
+  onLongPress?: () => void;
+  selectionMode?: boolean;
+  selected?: boolean;
 }
 
-export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onPress,
+  onToggleComplete,
+  onLongPress,
+  selectionMode = false,
+  selected = false,
+}: TaskCardProps) {
   const { colors } = useTheme();
 
   return (
@@ -20,28 +30,50 @@ export function TaskCard({ task, onPress, onToggleComplete }: TaskCardProps) {
       style={[
         styles.card,
         {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          opacity: task.isCompleted ? 0.6 : 1,
+          backgroundColor: selected ? colors.primaryMuted : colors.surface,
+          borderColor: selected ? colors.primary : colors.border,
+          opacity: task.isCompleted && !selected ? 0.6 : 1,
         },
       ]}
     >
       <Pressable
-        onPress={onToggleComplete}
+        onPress={selectionMode ? onPress : onToggleComplete}
+        onLongPress={onLongPress}
+        delayLongPress={300}
         hitSlop={12}
         style={styles.checkbox}
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: task.isCompleted }}
+        accessibilityState={{
+          checked: selectionMode ? selected : task.isCompleted,
+        }}
       >
         <Ionicons
-          name={task.isCompleted ? "checkbox" : "square-outline"}
+          name={
+            selectionMode
+              ? selected
+                ? "checkmark-circle"
+                : "ellipse-outline"
+              : task.isCompleted
+                ? "checkbox"
+                : "square-outline"
+          }
           size={24}
-          color={task.isCompleted ? colors.success : colors.textSecondary}
+          color={
+            selectionMode
+              ? selected
+                ? colors.primary
+                : colors.textSecondary
+              : task.isCompleted
+                ? colors.success
+                : colors.textSecondary
+          }
         />
       </Pressable>
 
       <Pressable
         onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={300}
         style={({ pressed }) => [
           styles.content,
           pressed && !task.isCompleted && styles.contentPressed,
