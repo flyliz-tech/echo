@@ -15,7 +15,7 @@ const LIGHT_STATUS_BAR_BG = "#000000";
 
 function RootLayoutContent() {
   const router = useRouter();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const initialize = useTaskStore((s) => s.initialize);
   const isInitialized = useTaskStore((s) => s.isInitialized);
@@ -26,8 +26,8 @@ function RootLayoutContent() {
   useEffect(() => {
     if (Platform.OS !== "android") return;
     RNStatusBar.setBarStyle("light-content");
-    RNStatusBar.setBackgroundColor(isDark ? colors.background : LIGHT_STATUS_BAR_BG);
-  }, [isDark, colors.background]);
+    RNStatusBar.setBackgroundColor(LIGHT_STATUS_BAR_BG);
+  }, []);
 
   useEffect(() => {
     initialize();
@@ -57,7 +57,7 @@ function RootLayoutContent() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar style="light" />
-      {!isDark && insets.top > 0 && (
+      {insets.top > 0 && (
         <View
           style={{
             height: insets.top,

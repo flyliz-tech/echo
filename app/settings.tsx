@@ -64,9 +64,11 @@ export default function SettingsScreen() {
                   {option.label}
                 </Text>
               </View>
-              {active && (
-                <Ionicons name="checkmark" size={22} color={colors.primary} />
-              )}
+              <View style={styles.checkSlot}>
+                {active && (
+                  <Ionicons name="checkmark" size={22} color={colors.primary} />
+                )}
+              </View>
             </Pressable>
           );
         })}
@@ -98,6 +100,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
+    minHeight: 56,
+  },
+  checkSlot: {
+    width: 22,
+    height: 22,
+    alignItems: "center",
+    justifyContent: "center",
   },
   rowLeft: {
     flexDirection: "row",
