@@ -23,6 +23,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
 import { spacing, typography } from "@/constants/theme";
@@ -76,6 +77,8 @@ export default function CalendarScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={["bottom"]}
     >
+      <ScreenHeader title="Calendar" />
+
       <View style={styles.monthHeader}>
         <Pressable onPress={() => setCurrentMonth(subMonths(currentMonth, 1))}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />

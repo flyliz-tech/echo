@@ -5,6 +5,7 @@ import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
@@ -14,7 +15,7 @@ import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
   const sortMode = useTaskStore((s) => s.sortMode);
   const setSortMode = useTaskStore((s) => s.setSortMode);
@@ -79,54 +80,56 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={isDark ? ["top", "bottom"] : ["bottom"]}
+      edges={["bottom"]}
     >
       {selectionMode ? (
-        <View style={styles.topBar}>
-          <Pressable
-            onPress={exitSelection}
-            hitSlop={8}
-            accessibilityLabel="Cancel selection"
-          >
-            <Ionicons name="close" size={24} color={colors.text} />
-          </Pressable>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {selectedIds.size} selected
-          </Text>
-          <View style={styles.selectionActions}>
+        <ScreenHeader
+          title={`${selectedIds.size} selected`}
+          left={
             <Pressable
-              onPress={toggleSelectAll}
+              onPress={exitSelection}
               hitSlop={8}
-              accessibilityLabel="Select all"
+              accessibilityLabel="Cancel selection"
             >
-              <Ionicons
-                name={allSelected ? "checkbox" : "square-outline"}
-                size={24}
-                color={colors.primary}
-              />
+              <Ionicons name="close" size={24} color={colors.text} />
             </Pressable>
-            <Pressable
-              onPress={confirmDelete}
-              hitSlop={8}
-              accessibilityLabel="Delete selected"
-            >
-              <Ionicons name="trash-outline" size={24} color={colors.danger} />
-            </Pressable>
-          </View>
-        </View>
+          }
+          right={
+            <>
+              <Pressable
+                onPress={toggleSelectAll}
+                hitSlop={8}
+                accessibilityLabel="Select all"
+              >
+                <Ionicons
+                  name={allSelected ? "checkbox" : "square-outline"}
+                  size={24}
+                  color={colors.primary}
+                />
+              </Pressable>
+              <Pressable
+                onPress={confirmDelete}
+                hitSlop={8}
+                accessibilityLabel="Delete selected"
+              >
+                <Ionicons name="trash-outline" size={24} color={colors.danger} />
+              </Pressable>
+            </>
+          }
+        />
       ) : (
-        <View style={styles.topBar}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {searchFocused ? "Search" : "Echo"}
-          </Text>
-          <Pressable
-            onPress={() => router.push("/settings")}
-            hitSlop={8}
-            accessibilityLabel="Settings"
-          >
-            <Ionicons name="settings-outline" size={24} color={colors.text} />
-          </Pressable>
-        </View>
+        <ScreenHeader
+          title="Echo"
+          right={
+            <Pressable
+              onPress={() => router.push("/settings")}
+              hitSlop={8}
+              accessibilityLabel="Settings"
+            >
+              <Ionicons name="settings-outline" size={24} color={colors.text} />
+            </Pressable>
+          }
+        />
       )}
 
       {!selectionMode && (
@@ -179,26 +182,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.md,
-  },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: spacing.sm,
-    minHeight: 44,
-  },
-  title: {
-    ...typography.title,
-    fontSize: 20,
-  },
-  selectionActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.lg,
-  },
-  sortLabel: {
-    ...typography.caption,
-    marginBottom: spacing.xs,
   },
   list: {
     paddingBottom: spacing.lg,

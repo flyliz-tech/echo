@@ -1,13 +1,20 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { TaskForm } from "@/components/TaskForm";
+import { useTheme } from "@/hooks/useTheme";
+import { spacing } from "@/constants/theme";
 import { requestNotificationPermissions } from "@/lib/services/notifications";
 import { deriveTriggerType, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function CreateTaskScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const createTask = useTaskStore((s) => s.createTask);
   const [formKey, setFormKey] = useState(0);
 
@@ -18,18 +25,47 @@ export default function CreateTaskScreen() {
   );
 
   return (
-    <TaskForm
-      key={formKey}
-      submitLabel="Save"
-      onCancel={() => router.replace("/(tabs)")}
-      onSubmit={async (input) => {
-        const triggerType = input.triggerType ?? deriveTriggerType(input);
-        if (hasTimeTrigger({ triggerType })) {
-          await requestNotificationPermissions();
-        }
-        await createTask(input);
-        router.replace("/(tabs)");
-      }}
-    />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={["bottom"]}
+    >
+      <View style={styles.headerPad}>
+        <ScreenHeader
+          title="Create Task"
+          left={
+            <Pressable
+              onPress={() => router.replace("/(tabs)")}
+              hitSlop={8}
+              accessibilityLabel="Back"
+            >
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </Pressable>
+          }
+        />
+      </View>
+
+      <TaskForm
+        key={formKey}
+        submitLabel="Save"
+        onCancel={() => router.replace("/(tabs)")}
+        onSubmit={async (input) => {
+          const triggerType = input.triggerType ?? deriveTriggerType(input);
+          if (hasTimeTrigger({ triggerType })) {
+            await requestNotificationPermissions();
+          }
+          await createTask(input);
+          router.replace("/(tabs)");
+        }}
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  headerPad: {
+    paddingHorizontal: spacing.md,
+  },
+});

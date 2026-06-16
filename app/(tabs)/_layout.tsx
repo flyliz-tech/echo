@@ -1,25 +1,21 @@
 import { Entypo, Ionicons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
+import { Tabs } from "expo-router";
+import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
-import { spacing } from "@/constants/theme";
 
 const TAB_BAR_HEIGHT = 49;
 const TAB_ICON_SIZE = 26;
 
 export default function TabLayout() {
   const { colors } = useTheme();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: colors.surface },
-        headerTintColor: colors.text,
-        headerShadowVisible: false,
+        headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: colors.surface,
@@ -41,7 +37,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          headerShown: false,
           title: "Echo",
           tabBarIcon: ({ color }) => (
             <Entypo name="home" size={TAB_ICON_SIZE} color={color} />
@@ -63,15 +58,6 @@ export default function TabLayout() {
           title: "Create Task",
           tabBarIcon: ({ color }) => (
             <Ionicons name="add-outline" size={TAB_ICON_SIZE} color={color} />
-          ),
-          headerLeft: () => (
-            <Pressable
-              onPress={() => router.replace("/(tabs)")}
-              style={{ marginLeft: spacing.md }}
-              hitSlop={8}
-            >
-              <Ionicons name="arrow-back" size={24} color={colors.text} />
-            </Pressable>
           ),
         }}
       />
