@@ -17,39 +17,41 @@ export function ScreenHeader({ title, left, right }: ScreenHeaderProps) {
 
   return (
     <View style={styles.header}>
-      <View style={styles.side}>{left}</View>
+      {left ? <View style={styles.left}>{left}</View> : null}
       <Text
         style={[styles.title, { color: colors.text }]}
         numberOfLines={1}
       >
         {title}
       </Text>
-      <View style={[styles.side, styles.right]}>{right}</View>
+      {right ? <View style={styles.right}>{right}</View> : null}
     </View>
   );
 }
-
-const SIDE_WIDTH = 72;
 
 const styles = StyleSheet.create({
   header: {
     height: HEADER_HEIGHT,
     flexDirection: "row",
     alignItems: "center",
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  side: {
-    width: SIDE_WIDTH,
+  left: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
+    marginRight: spacing.md,
   },
   right: {
-    justifyContent: "flex-end",
     flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginLeft: spacing.md,
   },
   title: {
     flex: 1,
-    textAlign: "center",
+    textAlign: "left",
     ...typography.title,
     fontSize: 20,
   },

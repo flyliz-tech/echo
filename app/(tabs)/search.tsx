@@ -36,7 +36,6 @@ export default function SearchScreen() {
         value={localQuery}
         onChangeText={handleSearch}
         active
-        autoFocus
       />
 
       <FlatList
