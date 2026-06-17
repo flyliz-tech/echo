@@ -128,7 +128,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for th
 
 ## License
 
-[MIT](LICENSE) © Gautham Prasad
+[MIT](LICENSE) © Gautham Prasad G
 
 ## Attribution
 
