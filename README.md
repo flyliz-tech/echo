@@ -6,6 +6,7 @@
 [![Platform: Android](https://img.shields.io/badge/platform-Android-brightgreen.svg)](#installation)
 [![Version](https://img.shields.io/badge/version-0.0.1--beta-orange.svg)](https://github.com/gautham-prasad/echo/releases)
 [![Built with Expo](https://img.shields.io/badge/built%20with-Expo-000020.svg)](https://expo.dev/)
+[![CI](https://github.com/gautham-prasad/echo/actions/workflows/ci.yml/badge.svg)](https://github.com/gautham-prasad/echo/actions/workflows/ci.yml)
 
 Echo is an offline-first reminders app built with Expo and React Native. Beyond plain to-dos, Echo triggers reminders by **time** or by **location** (geofencing), so a task can resurface the moment you walk into the grocery store or when it's finally due.
 
@@ -108,6 +109,12 @@ hooks/          useTheme and others
 ## Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the dev setup, branch model, and PR process.
+
+## Community
+
+- Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security policy: [SECURITY.md](SECURITY.md)
+- Support guide: [SUPPORT.md](SUPPORT.md)
 
 ## License
 
