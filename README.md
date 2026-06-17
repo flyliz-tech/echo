@@ -10,7 +10,9 @@
 
 Echo is an offline-first reminders app built with Expo and React Native. Beyond plain to-dos, Echo triggers reminders by **time** or by **location** (geofencing), so a task can resurface the moment you walk into the grocery store or when it's finally due.
 
-> Status: **v0.0.1 beta** — Android only, distributed as a sideloadable APK. See [Releases](https://github.com/flyliz-tech/echo/releases).
+> Status: **v0.0.1** — Android beta available now as a sideloadable APK.  
+> iOS beta (sideload build) coming soon.  
+> v1 target: official Play Store + App Store release.
 
 ## Features
 
@@ -61,9 +63,11 @@ Full setup and build-from-source steps: [Docs/INSTALLATION.md](Docs/INSTALLATION
 
 ## Install the App (Users)
 
-1. Download the latest `echo-vX.Y.Z.apk` from [Releases](https://github.com/flyliz-tech/echo/releases).
+1. Download the latest Android `echo-vX.Y.Z.apk` from [Releases](https://github.com/flyliz-tech/echo/releases).
 2. On your Android device, allow installing from unknown sources when prompted.
 3. Open the APK to install, then grant location and notification permissions.
+
+> iOS beta build is not published yet. It will be shared as a sideloadable build once available.
 
 Step-by-step guide: [Docs/USER_GUIDE.md](Docs/USER_GUIDE.md).
 
@@ -100,8 +104,9 @@ hooks/          useTheme and others
 
 ## Roadmap
 
-- Proper release signing + Google Play distribution
-- iOS release
+- iOS beta sideload release
+- Proper release signing
+- v1 official Play Store + App Store launch
 - Supabase auth and cloud sync
 - OTA updates
 - Premium features (custom audio, notification stacking)

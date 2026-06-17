@@ -1,6 +1,8 @@
 # Installation
 
-Echo is currently distributed as an Android APK (v0.0.1 beta). This guide covers both installing the prebuilt app and building from source.
+Echo `v0.0.1` is currently distributed as an Android sideload APK. This guide covers both installing the prebuilt app and building from source.
+
+iOS beta will be shared soon as a sideloadable build. Official store distribution is planned for v1.
 
 ## Option A: Install the prebuilt APK (recommended for users)
 
