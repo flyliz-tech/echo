@@ -21,4 +21,4 @@ Initial public beta (Android).
 - Android only; distributed as a sideloadable, debug-signed APK.
 - Geofencing should be tested on a physical device.
 
-[0.0.1]: https://github.com/gautham-prasad/echo/releases/tag/v0.0.1
+[0.0.1]: https://github.com/flyliz-tech/echo/releases/tag/v0.0.1

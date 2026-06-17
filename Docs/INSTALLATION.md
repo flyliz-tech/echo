@@ -4,7 +4,7 @@ Echo is currently distributed as an Android APK (v0.0.1 beta). This guide covers
 
 ## Option A: Install the prebuilt APK (recommended for users)
 
-1. Open [Releases](https://github.com/gautham-prasad/echo/releases) on your Android phone.
+1. Open [Releases](https://github.com/flyliz-tech/echo/releases) on your Android phone.
 2. Download the latest `echo-vX.Y.Z.apk` asset.
 3. When prompted, allow your browser/file manager to **install unknown apps** (Settings -> Apps -> Special access -> Install unknown apps).
 4. Tap the downloaded APK and confirm the install.
@@ -24,7 +24,7 @@ Echo is currently distributed as an Android APK (v0.0.1 beta). This guide covers
 ### Steps
 
 ```bash
-git clone https://github.com/gautham-prasad/echo.git
+git clone https://github.com/flyliz-tech/echo.git
 cd echo
 npm install
 

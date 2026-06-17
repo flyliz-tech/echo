@@ -11,7 +11,7 @@ Thanks for your interest in improving Echo! This guide covers how to set up the 
 ## Development Setup
 
 ```bash
-git clone https://github.com/gautham-prasad/echo.git
+git clone https://github.com/flyliz-tech/echo.git
 cd echo
 npm install
 npm start

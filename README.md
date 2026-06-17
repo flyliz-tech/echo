@@ -4,13 +4,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Android](https://img.shields.io/badge/platform-Android-brightgreen.svg)](#installation)
-[![Version](https://img.shields.io/badge/version-0.0.1--beta-orange.svg)](https://github.com/gautham-prasad/echo/releases)
+[![Version](https://img.shields.io/badge/version-0.0.1--beta-orange.svg)](https://github.com/flyliz-tech/echo/releases)
 [![Built with Expo](https://img.shields.io/badge/built%20with-Expo-000020.svg)](https://expo.dev/)
-[![CI](https://github.com/gautham-prasad/echo/actions/workflows/ci.yml/badge.svg)](https://github.com/gautham-prasad/echo/actions/workflows/ci.yml)
+[![CI](https://github.com/flyliz-tech/echo/actions/workflows/ci.yml/badge.svg)](https://github.com/flyliz-tech/echo/actions/workflows/ci.yml)
 
 Echo is an offline-first reminders app built with Expo and React Native. Beyond plain to-dos, Echo triggers reminders by **time** or by **location** (geofencing), so a task can resurface the moment you walk into the grocery store or when it's finally due.
 
-> Status: **v0.0.1 beta** — Android only, distributed as a sideloadable APK. See [Releases](https://github.com/gautham-prasad/echo/releases).
+> Status: **v0.0.1 beta** — Android only, distributed as a sideloadable APK. See [Releases](https://github.com/flyliz-tech/echo/releases).
 
 ## Features
 
@@ -36,13 +36,13 @@ _Screenshots coming soon._
 - **Database**: [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) — [`lib/db/`](lib/db/)
 - **Maps**: [MapLibre](https://maplibre.org/) with free [OpenFreeMap](https://openfreemap.org/) tiles (no API key)
 - **Geocoding**: keyless [Photon](https://photon.komoot.io/) (OpenStreetMap) — [`lib/services/geocoding.ts`](lib/services/geocoding.ts)
-- **Geofencing**: expo-location + expo-task-manager — [`lib/services/geofencing.ts`](lib/services/geofencing.ts)
+- **Geofencing**: expo-location + expo-task-manager — [`lib/services/geofencing.native.ts`](lib/services/geofencing.native.ts)
 - **Notifications**: expo-notifications — [`lib/services/notifications.ts`](lib/services/notifications.ts)
 
 ## Quick Start (Development)
 
 ```bash
-git clone https://github.com/gautham-prasad/echo.git
+git clone https://github.com/flyliz-tech/echo.git
 cd echo
 npm install
 npm start
@@ -61,7 +61,7 @@ Full setup and build-from-source steps: [Docs/INSTALLATION.md](Docs/INSTALLATION
 
 ## Install the App (Users)
 
-1. Download the latest `echo-vX.Y.Z.apk` from [Releases](https://github.com/gautham-prasad/echo/releases).
+1. Download the latest `echo-vX.Y.Z.apk` from [Releases](https://github.com/flyliz-tech/echo/releases).
 2. On your Android device, allow installing from unknown sources when prompted.
 3. Open the APK to install, then grant location and notification permissions.
 
