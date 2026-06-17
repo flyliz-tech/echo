@@ -82,6 +82,8 @@ npm run lint         # lint
 5. Open a PR into `development` using the PR template and describe the change and how you tested it.
 
 Maintainers aim to provide a first review response within 3 business days.
+Project governance and maintainer responsibilities are documented in
+[GOVERNANCE.md](GOVERNANCE.md) and [MAINTAINERS.md](MAINTAINERS.md).
 
 ## Reporting Issues
 

@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main, development]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     name: Type-check and lint
@@ -26,9 +33,5 @@ jobs:
       - name: Type-check
         run: npx tsc --noEmit
 
-      # Lint is informational: some platform-specific module imports
-      # (.native/.web suffixes) are false-positives for the import resolver
-      # but resolve correctly under tsc and Metro.
       - name: Lint
         run: npm run lint
-        continue-on-error: true

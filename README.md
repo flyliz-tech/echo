@@ -106,6 +106,8 @@ hooks/          useTheme and others
 - OTA updates
 - Premium features (custom audio, notification stacking)
 
+Detailed planning and priorities: [ROADMAP.md](ROADMAP.md).
+
 ## Contributing
 
 Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the dev setup, branch model, and PR process.
@@ -115,6 +117,9 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for th
 - Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - Security policy: [SECURITY.md](SECURITY.md)
 - Support guide: [SUPPORT.md](SUPPORT.md)
+- Governance model: [GOVERNANCE.md](GOVERNANCE.md)
+- Maintainer ownership: [MAINTAINERS.md](MAINTAINERS.md)
+- Release process: [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
 
 ## License
 
