@@ -16,3 +16,6 @@ graphify-out/
 
 expo-env.d.ts
 # @end expo-cli
+
+# Android build artifacts
+*.apk

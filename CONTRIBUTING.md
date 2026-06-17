@@ -81,9 +81,17 @@ npm run lint         # lint
 4. Ensure `tsc` and `lint` pass.
 5. Open a PR into `development` using the PR template and describe the change and how you tested it.
 
+Maintainers aim to provide a first review response within 3 business days.
+Project governance and maintainer responsibilities are documented in
+[GOVERNANCE.md](GOVERNANCE.md) and [MAINTAINERS.md](MAINTAINERS.md).
+
 ## Reporting Issues
 
 Use the issue templates for bug reports and feature requests. For bugs, include device/OS, steps to reproduce, and a screenshot or log if possible.
+
+## Reporting Security Issues
+
+Do not open public issues for security vulnerabilities. Follow [SECURITY.md](SECURITY.md) and use private reporting channels.
 
 ## License
 
