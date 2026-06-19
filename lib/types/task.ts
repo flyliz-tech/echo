@@ -1,5 +1,7 @@
 export type TriggerType = "location" | "time" | "both" | "none";
 
+export type Priority = "low" | "medium" | "high" | "urgent";
+
 export type SortMode =
   | "default"
   | "triggerTime"
@@ -16,7 +18,12 @@ export interface Task {
   radiusMeters: number;
   locationName: string | null;
   triggerTime: string | null;
+  priority: Priority;
   isCompleted: boolean;
+  /** ISO timestamp of the most recent completion, or null if never completed. */
+  completedAt: string | null;
+  /** ISO timestamp of the most recent reopen, or null if not currently reopened. */
+  reopenedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,11 +39,28 @@ export interface CreateTaskInput {
   radiusMeters?: number;
   locationName?: string | null;
   triggerTime?: string | null;
+  priority?: Priority;
 }
 
 export interface UpdateTaskInput extends Partial<CreateTaskInput> {
   isCompleted?: boolean;
 }
+
+export const DEFAULT_PRIORITY: Priority = "low";
+
+/** Ordered low → urgent, for rendering selectors and badges. */
+export const PRIORITIES: Priority[] = ["low", "medium", "high", "urgent"];
+
+/** Display metadata per priority: label, emoji, and a text/accent colour. */
+export const PRIORITY_META: Record<
+  Priority,
+  { label: string; emoji: string; color: string }
+> = {
+  low: { label: "Low", emoji: "🟢", color: "#16A34A" },
+  medium: { label: "Medium", emoji: "🟡", color: "#D97706" },
+  high: { label: "High", emoji: "🟠", color: "#EA580C" },
+  urgent: { label: "Urgent", emoji: "🔴", color: "#DC2626" },
+};
 
 export const TITLE_MAX_LENGTH = 150;
 export const NOTES_MAX_LENGTH = 500;
@@ -95,6 +119,38 @@ export function normalizeTriggerFields(
     locationName: locationActive
       ? input.locationName?.trim() || null
       : null,
+  };
+}
+
+/**
+ * Resolves the completion-related fields for a task update.
+ *
+ * - Completing (false -> true): records `completedAt` and clears `reopenedAt`.
+ * - Reopening (true -> false): records `reopenedAt` while preserving
+ *   `completedAt` so the previously-closed date stays visible.
+ * - No completion change: leaves all three fields untouched.
+ */
+export function resolveCompletion(
+  existing: Pick<Task, "isCompleted" | "completedAt" | "reopenedAt">,
+  nextIsCompleted: boolean | undefined,
+  now: string
+): Pick<Task, "isCompleted" | "completedAt" | "reopenedAt"> {
+  if (nextIsCompleted === undefined || nextIsCompleted === existing.isCompleted) {
+    return {
+      isCompleted: existing.isCompleted,
+      completedAt: existing.completedAt,
+      reopenedAt: existing.reopenedAt,
+    };
+  }
+
+  if (nextIsCompleted) {
+    return { isCompleted: true, completedAt: now, reopenedAt: null };
+  }
+
+  return {
+    isCompleted: false,
+    completedAt: existing.completedAt,
+    reopenedAt: now,
   };
 }
 

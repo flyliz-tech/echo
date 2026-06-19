@@ -3,7 +3,12 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
 import { radius, shadow, spacing, typography } from "@/constants/theme";
-import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
+import {
+  PRIORITY_META,
+  Task,
+  hasLocationTrigger,
+  hasTimeTrigger,
+} from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 
 interface TaskCardProps {
@@ -50,27 +55,26 @@ export function TaskCard({
           checked: selectionMode ? selected : task.isCompleted,
         }}
       >
-        <Ionicons
-          name={
-            selectionMode
-              ? selected
-                ? "checkmark-circle"
-                : "ellipse-outline"
-              : task.isCompleted
-                ? "checkbox"
-                : "square-outline"
-          }
-          size={24}
-          color={
-            selectionMode
-              ? selected
-                ? colors.primary
-                : colors.textSecondary
-              : task.isCompleted
-                ? colors.success
-                : colors.textSecondary
-          }
-        />
+        {selectionMode ? (
+          <Ionicons
+            name={selected ? "checkmark-circle" : "ellipse-outline"}
+            size={24}
+            color={selected ? colors.primary : colors.textSecondary}
+          />
+        ) : (
+          <View
+            style={[
+              styles.checkBox,
+              task.isCompleted
+                ? { backgroundColor: colors.success, borderColor: colors.success }
+                : { borderColor: colors.border },
+            ]}
+          >
+            {task.isCompleted && (
+              <Ionicons name="checkmark-sharp" size={15} color={colors.onPrimary} />
+            )}
+          </View>
+        )}
       </Pressable>
 
       <Pressable
@@ -82,16 +86,39 @@ export function TaskCard({
           pressed && !task.isCompleted && styles.contentPressed,
         ]}
       >
-        <Text
-          style={[
-            styles.title,
-            { color: colors.text },
-            task.isCompleted && styles.completedTitle,
-          ]}
-          numberOfLines={2}
-        >
-          {task.title}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text
+            style={[
+              styles.title,
+              { color: colors.text, flex: 1 },
+              task.isCompleted && styles.completedTitle,
+            ]}
+            numberOfLines={2}
+          >
+            {task.title}
+          </Text>
+          <View
+            style={[
+              styles.priorityBadge,
+              {
+                backgroundColor: `${PRIORITY_META[task.priority].color}1A`,
+                borderColor: `${PRIORITY_META[task.priority].color}55`,
+              },
+            ]}
+          >
+            <Text style={styles.priorityEmoji}>
+              {PRIORITY_META[task.priority].emoji}
+            </Text>
+            <Text
+              style={[
+                styles.priorityLabel,
+                { color: PRIORITY_META[task.priority].color },
+              ]}
+            >
+              {PRIORITY_META[task.priority].label}
+            </Text>
+          </View>
+        </View>
 
         {hasTimeTrigger(task) && task.triggerTime && (
           <View style={styles.row}>
@@ -135,6 +162,14 @@ const styles = StyleSheet.create({
   checkbox: {
     paddingTop: 2,
   },
+  checkBox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   content: {
     flex: 1,
     gap: spacing.xs,
@@ -157,5 +192,27 @@ const styles = StyleSheet.create({
   detail: {
     ...typography.caption,
     flex: 1,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+  },
+  priorityBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.full,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  priorityEmoji: {
+    fontSize: 10,
+  },
+  priorityLabel: {
+    ...typography.caption,
+    fontSize: 11,
+    fontWeight: "700",
   },
 });

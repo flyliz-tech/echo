@@ -3,11 +3,14 @@ import * as Crypto from "expo-crypto";
 import { getDatabase } from "./database";
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   DEFAULT_RADIUS_METERS,
+  Priority,
   Task,
   UpdateTaskInput,
   deriveTriggerType,
   normalizeTriggerFields,
+  resolveCompletion,
 } from "../types/task";
 
 interface TaskRow {
@@ -20,7 +23,10 @@ interface TaskRow {
   radius_meters: number;
   location_name: string | null;
   trigger_time: string | null;
+  priority: string | null;
   is_completed: number;
+  completed_at: string | null;
+  reopened_at: string | null;
   created_at: string;
   updated_at: string | null;
 }
@@ -36,7 +42,10 @@ function rowToTask(row: TaskRow): Task {
     radiusMeters: row.radius_meters,
     locationName: row.location_name,
     triggerTime: row.trigger_time,
+    priority: (row.priority as Priority | null) ?? DEFAULT_PRIORITY,
     isCompleted: row.is_completed === 1,
+    completedAt: row.completed_at,
+    reopenedAt: row.reopened_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at ?? row.created_at,
   };
@@ -76,7 +85,10 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     radiusMeters: input.radiusMeters ?? DEFAULT_RADIUS_METERS,
     locationName: triggerFields.locationName,
     triggerTime: triggerFields.triggerTime,
+    priority: input.priority ?? DEFAULT_PRIORITY,
     isCompleted: false,
+    completedAt: null,
+    reopenedAt: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -84,8 +96,9 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
   await db.runAsync(
     `INSERT INTO tasks (
       id, title, notes, trigger_type, latitude, longitude,
-      radius_meters, location_name, trigger_time, is_completed, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      radius_meters, location_name, trigger_time, priority, is_completed,
+      completed_at, reopened_at, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       task.id,
       task.title,
@@ -96,7 +109,10 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
       task.radiusMeters,
       task.locationName,
       task.triggerTime,
+      task.priority,
       task.isCompleted ? 1 : 0,
+      task.completedAt,
+      task.reopenedAt,
       task.createdAt,
       task.updatedAt,
     ]
@@ -137,6 +153,9 @@ export async function updateTask(
     mergedInput.triggerType ?? deriveTriggerType(mergedInput);
   const triggerFields = normalizeTriggerFields(mergedInput, triggerType);
 
+  const now = new Date().toISOString();
+  const completion = resolveCompletion(existing, input.isCompleted, now);
+
   const merged: Task = {
     ...existing,
     title: mergedInput.title!,
@@ -146,17 +165,20 @@ export async function updateTask(
     radiusMeters: mergedInput.radiusMeters ?? existing.radiusMeters,
     locationName: triggerFields.locationName,
     triggerTime: triggerFields.triggerTime,
-    isCompleted: input.isCompleted ?? existing.isCompleted,
+    priority: input.priority ?? existing.priority,
+    isCompleted: completion.isCompleted,
+    completedAt: completion.completedAt,
+    reopenedAt: completion.reopenedAt,
     triggerType,
-    updatedAt: new Date().toISOString(),
+    updatedAt: now,
   };
 
   const db = await getDatabase();
   await db.runAsync(
     `UPDATE tasks SET
       title = ?, notes = ?, trigger_type = ?, latitude = ?, longitude = ?,
-      radius_meters = ?, location_name = ?, trigger_time = ?, is_completed = ?,
-      updated_at = ?
+      radius_meters = ?, location_name = ?, trigger_time = ?, priority = ?,
+      is_completed = ?, completed_at = ?, reopened_at = ?, updated_at = ?
     WHERE id = ?`,
     [
       merged.title,
@@ -167,7 +189,10 @@ export async function updateTask(
       merged.radiusMeters,
       merged.locationName,
       merged.triggerTime,
+      merged.priority,
       merged.isCompleted ? 1 : 0,
+      merged.completedAt,
+      merged.reopenedAt,
       merged.updatedAt,
       id,
     ]
