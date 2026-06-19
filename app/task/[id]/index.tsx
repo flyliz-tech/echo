@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
 import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
+import { openTaskEdit } from "@/lib/navigation/taskRouting";
 import { formatDateTime, formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
 import { hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
@@ -100,7 +101,7 @@ export default function ViewTaskScreen() {
         <View style={styles.actions}>
           {!task.isCompleted && (
             <Pressable
-              onPress={() => router.push(`/task/${task.id}/edit`)}
+              onPress={() => openTaskEdit(router, task.id)}
               style={({ pressed }) => [
                 styles.button,
                 shadow.sm,

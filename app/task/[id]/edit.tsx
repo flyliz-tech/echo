@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 
 import { TaskForm, TaskFormValues } from "@/components/TaskForm";
 import { useTheme } from "@/hooks/useTheme";
+import { goBackOrHome } from "@/lib/navigation/taskRouting";
 import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -49,7 +50,7 @@ export default function EditTaskScreen() {
     <TaskForm
       initialValues={taskToFormValues(task)}
       submitLabel="Save"
-      onCancel={() => router.back()}
+      onCancel={() => goBackOrHome(router)}
       onSubmit={async (input) => {
         await updateTask(id, input);
         router.replace("/(tabs)");

@@ -8,6 +8,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-cont
 import "@/lib/services/geofencing";
 import { DeleteUndoToast } from "@/components/DeleteUndoToast";
 import { useTheme } from "@/hooks/useTheme";
+import { openTask } from "@/lib/navigation/taskRouting";
 import { setupNotificationResponseHandler } from "@/lib/services/notifications";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -35,7 +36,7 @@ function RootLayoutContent() {
 
   useEffect(() => {
     return setupNotificationResponseHandler((taskId) => {
-      router.push(`/task/${taskId}`);
+      openTask(router, taskId);
     });
   }, [router]);
 

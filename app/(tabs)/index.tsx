@@ -10,6 +10,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
 import { useTheme } from "@/hooks/useTheme";
+import { openTask } from "@/lib/navigation/taskRouting";
 import { radius, spacing, typography } from "@/constants/theme";
 import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
@@ -183,7 +184,7 @@ export default function HomeScreen() {
             onPress={() =>
               selectionMode
                 ? toggleSelect(item.id)
-                : router.push(`/task/${item.id}`)
+                : openTask(router, item.id)
             }
             onLongPress={() => {
               if (!selectionMode) enterSelection(item.id);
