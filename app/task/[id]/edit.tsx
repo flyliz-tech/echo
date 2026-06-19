@@ -10,6 +10,7 @@ function taskToFormValues(task: Task): TaskFormValues {
   return {
     title: task.title,
     notes: task.notes ?? "",
+    priority: task.priority,
     timeEnabled: hasTimeTrigger(task),
     locationEnabled: hasLocationTrigger(task),
     triggerTime: task.triggerTime ? new Date(task.triggerTime) : null,

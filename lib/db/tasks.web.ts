@@ -2,11 +2,13 @@ import * as Crypto from "expo-crypto";
 
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   DEFAULT_RADIUS_METERS,
   Task,
   UpdateTaskInput,
   deriveTriggerType,
   normalizeTriggerFields,
+  resolveCompletion,
 } from "../types/task";
 
 const tasks: Task[] = [];
@@ -35,7 +37,10 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     radiusMeters: input.radiusMeters ?? DEFAULT_RADIUS_METERS,
     locationName: triggerFields.locationName,
     triggerTime: triggerFields.triggerTime,
+    priority: input.priority ?? DEFAULT_PRIORITY,
     isCompleted: false,
+    completedAt: null,
+    reopenedAt: null,
     createdAt: now,
     updatedAt: now,
   };
@@ -77,6 +82,9 @@ export async function updateTask(
     mergedInput.triggerType ?? deriveTriggerType(mergedInput);
   const triggerFields = normalizeTriggerFields(mergedInput, triggerType);
 
+  const now = new Date().toISOString();
+  const completion = resolveCompletion(existing, input.isCompleted, now);
+
   const merged: Task = {
     ...existing,
     title: mergedInput.title!,
@@ -86,9 +94,12 @@ export async function updateTask(
     radiusMeters: mergedInput.radiusMeters ?? existing.radiusMeters,
     locationName: triggerFields.locationName,
     triggerTime: triggerFields.triggerTime,
-    isCompleted: input.isCompleted ?? existing.isCompleted,
+    priority: input.priority ?? existing.priority,
+    isCompleted: completion.isCompleted,
+    completedAt: completion.completedAt,
+    reopenedAt: completion.reopenedAt,
     triggerType,
-    updatedAt: new Date().toISOString(),
+    updatedAt: now,
   };
 
   tasks[index] = merged;

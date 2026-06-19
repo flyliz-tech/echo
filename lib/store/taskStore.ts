@@ -5,11 +5,8 @@ import { syncGeofences } from "@/lib/services/geofencing";
 import { syncNotifications } from "@/lib/services/notifications";
 import {
   CreateTaskInput,
-  SortMode,
   Task,
   UpdateTaskInput,
-  hasLocationTrigger,
-  hasTimeTrigger,
 } from "@/lib/types/task";
 
 interface PendingDelete {
@@ -21,14 +18,11 @@ export interface TaskStore {
   tasks: Task[];
   isLoading: boolean;
   isInitialized: boolean;
-  sortMode: SortMode;
   searchQuery: string;
   pendingDelete: PendingDelete | null;
 
   initialize: () => Promise<void>;
-  setSortMode: (mode: SortMode) => void;
   setSearchQuery: (query: string) => void;
-  getFilteredTasks: () => Task[];
 
   createTask: (input: CreateTaskInput) => Promise<Task>;
   updateTask: (id: string, input: UpdateTaskInput) => Promise<Task | null>;
@@ -39,57 +33,14 @@ export interface TaskStore {
   getTaskById: (id: string) => Task | undefined;
 }
 
-function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
-  if (sortMode === "showCompleted") {
-    return tasks
-      .filter((t) => t.isCompleted)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }
-
-  if (sortMode === "triggerTime") {
-    return tasks
-      .filter((t) => !t.isCompleted && hasTimeTrigger(t) && t.triggerTime)
-      .sort((a, b) => a.triggerTime!.localeCompare(b.triggerTime!));
-  }
-
-  if (sortMode === "location") {
-    return tasks
-      .filter((t) => !t.isCompleted && hasLocationTrigger(t))
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }
-
-  const byNewest = (a: Task, b: Task) => b.createdAt.localeCompare(a.createdAt);
-  const incomplete = tasks.filter((t) => !t.isCompleted).sort(byNewest);
-  const completed = tasks.filter((t) => t.isCompleted).sort(byNewest);
-  return [...incomplete, ...completed];
-}
-
-function filterTasks(tasks: Task[], query: string): Task[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return tasks;
-
-  return tasks.filter(
-    (t) =>
-      t.title.toLowerCase().includes(q) ||
-      (t.notes?.toLowerCase().includes(q) ?? false) ||
-      (t.locationName?.toLowerCase().includes(q) ?? false)
-  );
-}
-
 async function syncTriggers(): Promise<void> {
   await Promise.all([syncGeofences(), syncNotifications()]);
-}
-
-export function selectFilteredTasks(state: TaskStore): Task[] {
-  const sorted = sortTasks(state.tasks, state.sortMode);
-  return filterTasks(sorted, state.searchQuery);
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [],
   isLoading: false,
   isInitialized: false,
-  sortMode: "default",
   searchQuery: "",
   pendingDelete: null,
 
@@ -105,11 +56,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  setSortMode: (mode) => set({ sortMode: mode }),
-
   setSearchQuery: (query) => set({ searchQuery: query }),
-
-  getFilteredTasks: () => selectFilteredTasks(get()),
 
   createTask: async (input) => {
     const task = await taskDb.createTask(input);

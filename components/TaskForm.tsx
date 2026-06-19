@@ -4,6 +4,8 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useEffect, useRef, useState } from "react";
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
@@ -19,7 +21,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   NOTES_MAX_LENGTH,
+  PRIORITIES,
+  PRIORITY_META,
+  Priority,
   TITLE_MAX_LENGTH,
   deriveTriggerType,
   validateTaskInput,
@@ -28,6 +34,7 @@ import {
 export interface TaskFormValues {
   title: string;
   notes: string;
+  priority: Priority;
   timeEnabled: boolean;
   locationEnabled: boolean;
   triggerTime: Date | null;
@@ -47,6 +54,7 @@ interface TaskFormProps {
 const defaultValues: TaskFormValues = {
   title: "",
   notes: "",
+  priority: DEFAULT_PRIORITY,
   timeEnabled: false,
   locationEnabled: false,
   triggerTime: null,
@@ -83,12 +91,26 @@ export function TaskForm({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMounted = useRef(true);
+  const scrollRef = useRef<ScrollView>(null);
+  const notesFocused = useRef(false);
 
   useEffect(() => {
     isMounted.current = true;
     return () => {
       isMounted.current = false;
     };
+  }, []);
+
+  // When the keyboard finishes opening while the Notes field is focused, scroll
+  // it to the end so the description sits above the keyboard. The layout reverts
+  // to normal on its own once the keyboard dismisses.
+  useEffect(() => {
+    const sub = Keyboard.addListener("keyboardDidShow", () => {
+      if (notesFocused.current) {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }
+    });
+    return () => sub.remove();
   }, []);
 
   const update = (patch: Partial<TaskFormValues>) => {
@@ -150,6 +172,7 @@ export function TaskForm({
     const input: CreateTaskInput = {
       title: values.title,
       notes: values.notes || null,
+      priority: values.priority,
       timeEnabled: values.timeEnabled,
       locationEnabled: values.locationEnabled,
       triggerTime:
@@ -192,7 +215,12 @@ export function TaskForm({
   };
 
   return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
     <ScrollView
+      ref={scrollRef}
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
@@ -216,6 +244,42 @@ export function TaskForm({
             },
           ]}
         />
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
+          Priority
+        </Text>
+        <View style={styles.priorityRow}>
+          {PRIORITIES.map((priority) => {
+            const meta = PRIORITY_META[priority];
+            const active = values.priority === priority;
+            return (
+              <Pressable
+                key={priority}
+                onPress={() => update({ priority })}
+                style={[
+                  styles.priorityChip,
+                  {
+                    backgroundColor: active ? `${meta.color}1A` : colors.surface,
+                    borderColor: active ? meta.color : colors.border,
+                    borderWidth: active ? 1.5 : 1,
+                  },
+                ]}
+              >
+                <Text style={styles.priorityEmoji}>{meta.emoji}</Text>
+                <Text
+                  style={[
+                    styles.priorityLabel,
+                    { color: active ? meta.color : colors.textSecondary },
+                  ]}
+                >
+                  {meta.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <View style={styles.field}>
@@ -322,6 +386,15 @@ export function TaskForm({
         <TextInput
           value={values.notes}
           onChangeText={(notes) => update({ notes })}
+          onFocus={() => {
+            notesFocused.current = true;
+            // If the keyboard is already up (refocusing), scroll immediately;
+            // otherwise the keyboardDidShow listener handles it.
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }}
+          onBlur={() => {
+            notesFocused.current = false;
+          }}
           placeholder="Add notes or description"
           placeholderTextColor={colors.textSecondary}
           maxLength={NOTES_MAX_LENGTH}
@@ -375,6 +448,7 @@ export function TaskForm({
         </Pressable>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -400,6 +474,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     ...typography.body,
+  },
+  priorityRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  priorityChip: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    minHeight: layout.controlHeight,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.xs,
+  },
+  priorityEmoji: {
+    fontSize: 13,
+  },
+  priorityLabel: {
+    ...typography.label,
+    fontSize: 12,
+    fontWeight: "600",
   },
   notesInput: {
     minHeight: 120,

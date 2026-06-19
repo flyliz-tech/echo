@@ -7,6 +7,8 @@ import {
   DB_NAME,
   MIGRATE_TASKS_V2,
   MIGRATE_TASKS_V3,
+  MIGRATE_TASKS_V4,
+  MIGRATE_TASKS_V5,
   SCHEMA_VERSION,
 } from "./schema";
 
@@ -46,6 +48,20 @@ async function migrate(database: SQLite.SQLiteDatabase): Promise<void> {
     await database.execAsync(`
       ${MIGRATE_TASKS_V3}
       PRAGMA user_version = 3;
+    `);
+  }
+
+  if (currentVersion < 4) {
+    await database.execAsync(`
+      ${MIGRATE_TASKS_V4}
+      PRAGMA user_version = 4;
+    `);
+  }
+
+  if (currentVersion < 5) {
+    await database.execAsync(`
+      ${MIGRATE_TASKS_V5}
+      PRAGMA user_version = 5;
     `);
   }
 }

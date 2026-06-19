@@ -1,12 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Feedback, FeedbackToast } from "@/components/FeedbackToast";
 import { useTheme } from "@/hooks/useTheme";
 import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import { formatDateTime, formatTriggerTimeFull } from "@/lib/utils/formatTaskTime";
-import { hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
+import { PRIORITY_META, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function ViewTaskScreen() {
@@ -15,6 +19,40 @@ export default function ViewTaskScreen() {
   const { colors } = useTheme();
   const task = useTaskStore((s) => s.getTaskById(id));
   const deleteTaskWithUndo = useTaskStore((s) => s.deleteTaskWithUndo);
+
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const nonceRef = useRef(0);
+
+  const showFeedback = (message: string, type: Feedback["type"]) => {
+    setFeedback({ message, type, nonce: ++nonceRef.current });
+    Haptics.notificationAsync(
+      type === "success"
+        ? Haptics.NotificationFeedbackType.Success
+        : Haptics.NotificationFeedbackType.Error
+    ).catch(() => {});
+  };
+
+  const handleCopyNotes = async () => {
+    if (!task?.notes) return;
+    try {
+      await Clipboard.setStringAsync(task.notes);
+      showFeedback("Notes copied to clipboard", "success");
+    } catch {
+      showFeedback("Couldn't copy notes", "error");
+    }
+  };
+
+  const handleShareNotes = async () => {
+    if (!task?.notes) return;
+    try {
+      const result = await Share.share({ message: task.notes });
+      if (result.action === Share.sharedAction) {
+        showFeedback("Notes shared", "success");
+      }
+    } catch {
+      showFeedback("Couldn't share notes", "error");
+    }
+  };
 
   if (!task) {
     return (
@@ -36,6 +74,20 @@ export default function ViewTaskScreen() {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={[styles.title, { color: colors.text }]}>{task.title}</Text>
+
+        <View style={styles.row}>
+          <Text style={styles.priorityEmoji}>
+            {PRIORITY_META[task.priority].emoji}
+          </Text>
+          <Text
+            style={[
+              styles.priorityLabel,
+              { color: PRIORITY_META[task.priority].color },
+            ]}
+          >
+            {PRIORITY_META[task.priority].label} priority
+          </Text>
+        </View>
 
         {hasTimeTrigger(task) && task.triggerTime && (
           <View style={styles.row}>
@@ -67,9 +119,33 @@ export default function ViewTaskScreen() {
 
         {task.notes && (
           <View style={[styles.notesBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>
-              Notes
-            </Text>
+            <View style={styles.notesHeader}>
+              <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>
+                Notes
+              </Text>
+              <View style={styles.notesActions}>
+                <Pressable
+                  onPress={handleCopyNotes}
+                  hitSlop={8}
+                  accessibilityLabel="Copy notes"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <Ionicons name="copy-outline" size={20} color={colors.primary} />
+                </Pressable>
+                <Pressable
+                  onPress={handleShareNotes}
+                  hitSlop={8}
+                  accessibilityLabel="Share notes"
+                  style={({ pressed }) => pressed && styles.pressed}
+                >
+                  <Ionicons
+                    name="share-social-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                </Pressable>
+              </View>
+            </View>
             <Text style={[styles.notes, { color: colors.text }]}>{task.notes}</Text>
           </View>
         )}
@@ -95,6 +171,31 @@ export default function ViewTaskScreen() {
               Modified {formatDateTime(task.updatedAt)}
             </Text>
           </View>
+          {task.completedAt && (
+            <View style={styles.metaRow}>
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={16}
+                color={colors.textSecondary}
+              />
+              <Text style={[styles.metaText, { color: colors.textSecondary }]}>
+                {task.isCompleted ? "Completed" : "Previously completed"}{" "}
+                {formatDateTime(task.completedAt)}
+              </Text>
+            </View>
+          )}
+          {task.reopenedAt && !task.isCompleted && (
+            <View style={styles.metaRow}>
+              <Ionicons
+                name="refresh-outline"
+                size={16}
+                color={colors.textSecondary}
+              />
+              <Text style={[styles.metaText, { color: colors.textSecondary }]}>
+                Reopened {formatDateTime(task.reopenedAt)}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.actions}>
@@ -131,6 +232,8 @@ export default function ViewTaskScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <FeedbackToast feedback={feedback} onHidden={() => setFeedback(null)} />
     </SafeAreaView>
   );
 }
@@ -161,6 +264,13 @@ const styles = StyleSheet.create({
     ...typography.body,
     flex: 1,
   },
+  priorityEmoji: {
+    fontSize: 14,
+  },
+  priorityLabel: {
+    ...typography.label,
+    fontWeight: "700",
+  },
   notesBox: {
     borderWidth: 1,
     borderRadius: radius.md,
@@ -168,9 +278,19 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     marginBottom: spacing.lg,
   },
+  notesHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
+  },
+  notesActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
   notesLabel: {
     ...typography.label,
-    marginBottom: spacing.xs,
   },
   notes: {
     ...typography.body,

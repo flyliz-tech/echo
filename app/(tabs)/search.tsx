@@ -3,14 +3,14 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useShallow } from "zustand/react/shallow";
 
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
+import { useVisibleTasks } from "@/hooks/useVisibleTasks";
 import { spacing, typography } from "@/constants/theme";
-import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
+import { useTaskStore } from "@/lib/store/taskStore";
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function SearchScreen() {
     setSearchQuery(query);
   };
 
-  const tasks = useTaskStore(useShallow(selectFilteredTasks));
+  const tasks = useVisibleTasks();
 
   return (
     <SafeAreaView
