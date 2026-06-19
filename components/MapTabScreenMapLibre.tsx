@@ -20,6 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MapPin } from "@/components/MapPin";
 import { useTheme } from "@/hooks/useTheme";
+import { openTask } from "@/lib/navigation/taskRouting";
 import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import {
   DEFAULT_CENTER,
@@ -154,7 +155,7 @@ export default function MapTabScreenMapLibre() {
             )}
             <Pressable
               onPress={() => {
-                router.push(`/task/${selectedTask.id}`);
+                openTask(router, selectedTask.id);
                 setSelectedTask(null);
               }}
               style={[styles.viewButton, { backgroundColor: colors.primary }]}

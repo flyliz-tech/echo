@@ -9,6 +9,7 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
+import { openTask } from "@/lib/navigation/taskRouting";
 import { spacing, typography } from "@/constants/theme";
 import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
 
@@ -62,7 +63,7 @@ export default function SearchScreen() {
         renderItem={({ item }) => (
           <TaskCard
             task={item}
-            onPress={() => router.push(`/task/${item.id}`)}
+            onPress={() => openTask(router, item.id)}
             onToggleComplete={() => toggleComplete(item.id)}
           />
         )}

@@ -4,6 +4,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
+import { openTask } from "@/lib/navigation/taskRouting";
 import { spacing, typography } from "@/constants/theme";
 import { hasLocationTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
@@ -43,7 +44,7 @@ export default function MapTabScreenFallback() {
         renderItem={({ item }) => (
           <TaskCard
             task={item}
-            onPress={() => router.push(`/task/${item.id}`)}
+            onPress={() => openTask(router, item.id)}
             onToggleComplete={() => toggleComplete(item.id)}
           />
         )}
