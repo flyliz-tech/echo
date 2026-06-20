@@ -36,7 +36,7 @@ _Screenshots coming soon._
 - **UI / Navigation**: React Native 0.81, Expo 54, [Expo Router](https://docs.expo.dev/router/introduction/)
 - **State**: [Zustand](https://github.com/pmndrs/zustand) — [`lib/store/taskStore.ts`](lib/store/taskStore.ts)
 - **Database**: [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) — [`lib/db/`](lib/db/)
-- **Maps**: [MapLibre](https://maplibre.org/) renderer with [Mapbox](https://www.mapbox.com/) style provider
+- **Maps**: [Mapbox native SDK](https://github.com/rnmapbox/maps) via `@rnmapbox/maps`
 - **Geocoding**: Mapbox Search API (session-token flow with client caching) — [`lib/services/geocoding.ts`](lib/services/geocoding.ts)
 - **Geofencing**: expo-location + expo-task-manager — [`lib/services/geofencing.native.ts`](lib/services/geofencing.native.ts)
 - **Notifications**: expo-notifications — [`lib/services/notifications.ts`](lib/services/notifications.ts)

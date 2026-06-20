@@ -30,7 +30,7 @@ export function LocationPickerFallback({
   onLocationChange,
   onLocationNameChange,
   onRadiusChange,
-  message = "Map picker requires a development build with MapLibre",
+  message = "Map picker requires a development build with Mapbox SDK",
 }: LocationPickerProps & { message?: string }) {
   const { colors } = useTheme();
   const [hasInitializedLocation, setHasInitializedLocation] = useState(

@@ -1,10 +1,12 @@
 import {
   Camera,
   type CameraRef,
-  GeoJSONSource,
-  Layer,
-  Map,
-} from "@maplibre/maplibre-react-native";
+  FillLayer,
+  LineLayer,
+  MapState,
+  MapView,
+  ShapeSource,
+} from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
@@ -14,6 +16,7 @@ import { MapPin } from "@/components/MapPin";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { type LocationPickerProps } from "@/components/LocationPickerFallback";
 import { useTheme } from "@/hooks/useTheme";
+import { configureMapbox } from "@/lib/services/mapbox";
 import { radius, spacing, typography } from "@/constants/theme";
 import {
   DEFAULT_CENTER,
@@ -52,6 +55,7 @@ function MapArea({
   onEnlarge,
   mapStyle,
 }: MapAreaProps) {
+  configureMapbox();
   const { colors } = useTheme();
   const cameraRef = useRef<CameraRef>(null);
 
@@ -69,52 +73,58 @@ function MapArea({
 
   useEffect(() => {
     if (latitude == null || longitude == null) return;
-    cameraRef.current?.jumpTo({
-      center: [longitude, latitude],
-      zoom: PICKER_ZOOM,
+    cameraRef.current?.setCamera({
+      centerCoordinate: [longitude, latitude],
+      zoomLevel: PICKER_ZOOM,
+      animationDuration: 200,
     });
   }, [latitude, longitude]);
 
+  const handleCameraChanged = useCallback(
+    (state: MapState) => {
+      if (!state.gestures.isGestureActive) return;
+      const center = state.properties.center;
+      if (!center || center.length < 2) return;
+      const [lng, lat] = center;
+      if (!Number.isFinite(lng) || !Number.isFinite(lat)) return;
+      onPick(lat, lng);
+    },
+    [onPick]
+  );
+
   return (
     <View style={styles.mapWrapper}>
-      <Map
+      <MapView
         style={mapStyle}
-        mapStyle={MAP_STYLE_URL}
-        logo
-        attribution
-        onPress={(event) => {
-          const [lng, lat] = event.nativeEvent.lngLat;
-          onPick(lat, lng);
-        }}
-        onRegionDidChange={(event) => {
-          if (!event.nativeEvent.userInteraction) return;
-          const [lng, lat] = event.nativeEvent.center;
-          onPick(lat, lng);
-        }}
+        styleURL={MAP_STYLE_URL}
+        logoEnabled
+        attributionEnabled
+        onCameraChanged={handleCameraChanged}
       >
         <Camera
           ref={cameraRef}
-          initialViewState={{ center: [pinLng, pinLat], zoom: PICKER_ZOOM }}
+          defaultSettings={{
+            centerCoordinate: [pinLng, pinLat],
+            zoomLevel: PICKER_ZOOM,
+          }}
         />
-        <GeoJSONSource id="picker-radius-fill" data={polygonData}>
-          <Layer
+        <ShapeSource id="picker-radius-fill" shape={polygonData}>
+          <FillLayer
             id="picker-radius-fill-layer"
-            type="fill"
-            paint={{ "fill-color": colors.primary, "fill-opacity": 0.15 }}
+            style={{ fillColor: colors.primary, fillOpacity: 0.15 }}
           />
-        </GeoJSONSource>
-        <GeoJSONSource id="picker-radius-outline" data={outlineData}>
-          <Layer
+        </ShapeSource>
+        <ShapeSource id="picker-radius-outline" shape={outlineData}>
+          <LineLayer
             id="picker-radius-line-layer"
-            type="line"
-            paint={{
-              "line-color": colors.primary,
-              "line-opacity": 0.5,
-              "line-width": 2,
+            style={{
+              lineColor: colors.primary,
+              lineOpacity: 0.5,
+              lineWidth: 2,
             }}
           />
-        </GeoJSONSource>
-      </Map>
+        </ShapeSource>
+      </MapView>
       <View pointerEvents="none" style={styles.centerPin}>
         <MapPin size={28} />
       </View>
@@ -174,7 +184,7 @@ function RadiusControl({ radiusMeters, onRadiusChange }: RadiusControlProps) {
   );
 }
 
-export function LocationPickerMapLibre(props: LocationPickerProps) {
+export function LocationPickerMapbox(props: LocationPickerProps) {
   const {
     latitude,
     longitude,

@@ -1,13 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  Camera,
-  type CameraRef,
-  Map,
-  Marker,
-} from "@maplibre/maplibre-react-native";
+import { Camera, type CameraRef, MapView, PointAnnotation } from "@rnmapbox/maps";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -20,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MapPin } from "@/components/MapPin";
 import { useTheme } from "@/hooks/useTheme";
+import { configureMapbox } from "@/lib/services/mapbox";
 import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
 import {
   DEFAULT_CENTER,
@@ -31,7 +27,8 @@ import { Task, hasLocationTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 import { useTaskStore } from "@/lib/store/taskStore";
 
-export default function MapTabScreenMapLibre() {
+export default function MapTabScreenMapbox() {
+  configureMapbox();
   const router = useRouter();
   const { colors } = useTheme();
   const tasks = useTaskStore((s) => s.tasks);
@@ -42,27 +39,64 @@ export default function MapTabScreenMapLibre() {
     null
   );
 
+  const moveCameraTo = useCallback(
+    (center: [number, number], duration = 800) => {
+      cameraRef.current?.setCamera({
+        centerCoordinate: center,
+        zoomLevel: RECENTER_ZOOM,
+        heading: 0,
+        pitch: 0,
+        animationDuration: duration,
+      });
+    },
+    []
+  );
+
+  const fetchCurrentLocation = useCallback(async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") return null;
+
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+
+    return [position.coords.longitude, position.coords.latitude] as [number, number];
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const center = await fetchCurrentLocation();
+        if (!center || cancelled) return;
+        setUserLocation(center);
+        moveCameraTo(center, 0);
+      } catch {
+        // keep fallback center when location is unavailable
+      }
+    };
+
+    void init();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchCurrentLocation, moveCameraTo]);
+
   const recenter = useCallback(async () => {
     if (locating) return;
     setLocating(true);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
+      const center = await fetchCurrentLocation();
+      if (!center) {
         Alert.alert(
           "Location needed",
           "Enable location access to center the map on your current position."
         );
         return;
       }
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      const center: [number, number] = [
-        position.coords.longitude,
-        position.coords.latitude,
-      ];
       setUserLocation(center);
-      cameraRef.current?.flyTo({ center, zoom: RECENTER_ZOOM, duration: 800 });
+      moveCameraTo(center);
     } catch {
       Alert.alert(
         "Location unavailable",
@@ -71,7 +105,7 @@ export default function MapTabScreenMapLibre() {
     } finally {
       setLocating(false);
     }
-  }, [locating]);
+  }, [fetchCurrentLocation, locating, moveCameraTo]);
 
   const locationTasks = useMemo(
     () =>
@@ -85,51 +119,56 @@ export default function MapTabScreenMapLibre() {
     [tasks]
   );
 
-  const initialViewState = useMemo(() => {
+  const initialCenter = useMemo<[number, number]>(() => {
     const first = locationTasks[0];
     if (first?.latitude != null && first.longitude != null) {
-      return {
-        center: [first.longitude, first.latitude] as [number, number],
-        zoom: latitudeDeltaToZoom(0.08),
-      };
+      return [first.longitude, first.latitude];
     }
-    return {
-      center: [DEFAULT_CENTER.longitude, DEFAULT_CENTER.latitude] as [
-        number,
-        number,
-      ],
-      zoom: latitudeDeltaToZoom(0.08),
-    };
+    return [DEFAULT_CENTER.longitude, DEFAULT_CENTER.latitude];
   }, [locationTasks]);
 
   return (
     <View style={styles.container}>
-      <Map
+      <MapView
         style={styles.map}
-        mapStyle={MAP_STYLE_URL}
-        logo
-        attribution
+        styleURL={MAP_STYLE_URL}
+        logoEnabled
+        attributionEnabled
       >
-        <Camera ref={cameraRef} initialViewState={initialViewState} />
+        <Camera
+          ref={cameraRef}
+          defaultSettings={{
+            centerCoordinate: initialCenter,
+            zoomLevel: latitudeDeltaToZoom(0.08),
+            heading: 0,
+            pitch: 0,
+          }}
+        />
         {userLocation && (
-          <Marker id="user-location" lngLat={userLocation} anchor="center">
-            <View style={[styles.userDotRing, { backgroundColor: colors.primaryMuted }]}>
+          <PointAnnotation
+            id="user-location"
+            coordinate={userLocation}
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <View
+              style={[styles.userDotRing, { backgroundColor: colors.primaryMuted }]}
+            >
               <View style={[styles.userDot, { backgroundColor: colors.primary }]} />
             </View>
-          </Marker>
+          </PointAnnotation>
         )}
         {locationTasks.map((task) => (
-          <Marker
+          <PointAnnotation
             key={task.id}
             id={task.id}
-            lngLat={[task.longitude!, task.latitude!]}
-            anchor="bottom"
-            onPress={() => setSelectedTask(task)}
+            coordinate={[task.longitude!, task.latitude!]}
+            anchor={{ x: 0.5, y: 1 }}
+            onSelected={() => setSelectedTask(task)}
           >
             <MapPin size={32} />
-          </Marker>
+          </PointAnnotation>
         ))}
-      </Map>
+      </MapView>
 
       {selectedTask && (
         <SafeAreaView style={styles.tooltipWrapper} edges={["bottom"]}>

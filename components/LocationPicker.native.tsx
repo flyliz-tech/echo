@@ -2,15 +2,15 @@ import {
   LocationPickerFallback,
   type LocationPickerProps,
 } from "@/components/LocationPickerFallback";
-import { isMapLibreAvailable } from "@/lib/native/mapLibre";
+import { hasMapboxToken, isMapboxAvailable } from "@/lib/native/mapbox";
 
 export function LocationPicker(props: LocationPickerProps) {
-  if (!isMapLibreAvailable()) {
+  if (!isMapboxAvailable() || !hasMapboxToken()) {
     return <LocationPickerFallback {...props} />;
   }
 
-  const { LocationPickerMapLibre } =
-    require("@/components/LocationPickerMapLibre") as typeof import("@/components/LocationPickerMapLibre");
+  const { LocationPickerMapbox } =
+    require("@/components/LocationPickerMapbox") as typeof import("@/components/LocationPickerMapbox");
 
-  return <LocationPickerMapLibre {...props} />;
+  return <LocationPickerMapbox {...props} />;
 }
