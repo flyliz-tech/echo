@@ -107,8 +107,8 @@ export default function MapTabScreenMapLibre() {
       <Map
         style={styles.map}
         mapStyle={MAP_STYLE_URL}
-        logo={false}
-        attribution={false}
+        logo
+        attribution
       >
         <Camera ref={cameraRef} initialViewState={initialViewState} />
         {userLocation && (

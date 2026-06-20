@@ -36,8 +36,8 @@ _Screenshots coming soon._
 - **UI / Navigation**: React Native 0.81, Expo 54, [Expo Router](https://docs.expo.dev/router/introduction/)
 - **State**: [Zustand](https://github.com/pmndrs/zustand) — [`lib/store/taskStore.ts`](lib/store/taskStore.ts)
 - **Database**: [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/) — [`lib/db/`](lib/db/)
-- **Maps**: [MapLibre](https://maplibre.org/) with free [OpenFreeMap](https://openfreemap.org/) tiles (no API key)
-- **Geocoding**: keyless [Photon](https://photon.komoot.io/) (OpenStreetMap) — [`lib/services/geocoding.ts`](lib/services/geocoding.ts)
+- **Maps**: [MapLibre](https://maplibre.org/) renderer with [Mapbox](https://www.mapbox.com/) style provider
+- **Geocoding**: Mapbox Search API (session-token flow with client caching) — [`lib/services/geocoding.ts`](lib/services/geocoding.ts)
 - **Geofencing**: expo-location + expo-task-manager — [`lib/services/geofencing.native.ts`](lib/services/geofencing.native.ts)
 - **Notifications**: expo-notifications — [`lib/services/notifications.ts`](lib/services/notifications.ts)
 
@@ -47,6 +47,7 @@ _Screenshots coming soon._
 git clone https://github.com/flyliz-tech/echo.git
 cd echo
 npm install
+cp .env.example .env
 npm start
 ```
 
@@ -88,6 +89,12 @@ Echo requests:
 - `npm run android:dev:install` — install the debug APK via adb
 - `npm run android:prod:install` — install the release APK via adb
 - `npm run lint` — run the linter
+
+## Mapbox Configuration
+
+- Set `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` in `.env` (public token).
+- App uses Mapbox Search API session tokens and local in-memory cache to reduce billable requests.
+- `EXPO_PUBLIC_MAPBOX_SOFT_DAILY_LIMIT` provides soft warnings for free-tier budget control.
 
 ## Architecture
 
@@ -132,5 +139,4 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for th
 
 ## Attribution
 
-- Map tiles © [OpenFreeMap](https://openfreemap.org/) and [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
-- Geocoding by [Photon](https://photon.komoot.io/), data © OpenStreetMap contributors.
+- Maps and geocoding by [Mapbox](https://www.mapbox.com/).
