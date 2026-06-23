@@ -3,7 +3,9 @@ import * as Crypto from "expo-crypto";
 import { getDatabase } from "./database";
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   DEFAULT_RADIUS_METERS,
+  Priority,
   Task,
   UpdateTaskInput,
   deriveTriggerType,
@@ -14,6 +16,7 @@ interface TaskRow {
   id: string;
   title: string;
   notes: string | null;
+  priority: string | null;
   trigger_type: string;
   latitude: number | null;
   longitude: number | null;
@@ -30,6 +33,7 @@ function rowToTask(row: TaskRow): Task {
     id: row.id,
     title: row.title,
     notes: row.notes,
+    priority: (row.priority as Priority) ?? DEFAULT_PRIORITY,
     triggerType: row.trigger_type as Task["triggerType"],
     latitude: row.latitude,
     longitude: row.longitude,
@@ -70,6 +74,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     id,
     title: input.title.trim(),
     notes: input.notes?.trim() || null,
+    priority: input.priority ?? DEFAULT_PRIORITY,
     triggerType,
     latitude: triggerFields.latitude,
     longitude: triggerFields.longitude,
@@ -83,13 +88,14 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
 
   await db.runAsync(
     `INSERT INTO tasks (
-      id, title, notes, trigger_type, latitude, longitude,
+      id, title, notes, priority, trigger_type, latitude, longitude,
       radius_meters, location_name, trigger_time, is_completed, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       task.id,
       task.title,
       task.notes,
+      task.priority,
       task.triggerType,
       task.latitude,
       task.longitude,
@@ -118,6 +124,7 @@ export async function updateTask(
       input.notes !== undefined
         ? input.notes?.trim() || null
         : existing.notes,
+    priority: input.priority ?? existing.priority,
     latitude: input.latitude !== undefined ? input.latitude : existing.latitude,
     longitude:
       input.longitude !== undefined ? input.longitude : existing.longitude,
@@ -141,6 +148,7 @@ export async function updateTask(
     ...existing,
     title: mergedInput.title!,
     notes: mergedInput.notes ?? null,
+    priority: mergedInput.priority ?? existing.priority,
     latitude: triggerFields.latitude,
     longitude: triggerFields.longitude,
     radiusMeters: mergedInput.radiusMeters ?? existing.radiusMeters,
@@ -154,13 +162,14 @@ export async function updateTask(
   const db = await getDatabase();
   await db.runAsync(
     `UPDATE tasks SET
-      title = ?, notes = ?, trigger_type = ?, latitude = ?, longitude = ?,
+      title = ?, notes = ?, priority = ?, trigger_type = ?, latitude = ?, longitude = ?,
       radius_meters = ?, location_name = ?, trigger_time = ?, is_completed = ?,
       updated_at = ?
     WHERE id = ?`,
     [
       merged.title,
       merged.notes,
+      merged.priority,
       merged.triggerType,
       merged.latitude,
       merged.longitude,

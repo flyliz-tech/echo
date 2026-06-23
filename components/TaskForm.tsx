@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import {
   Platform,
@@ -15,11 +16,17 @@ import {
 } from "react-native";
 
 import { LocationPicker } from "@/components/LocationPicker";
+import { EchoCard } from "@/components/ui/EchoCard";
+import { GhostButton } from "@/components/ui/GhostButton";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { PriorityPills } from "@/components/ui/PriorityPills";
 import { useTheme } from "@/hooks/useTheme";
-import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
+import { layout, radius, spacing, typography } from "@/constants/theme";
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   NOTES_MAX_LENGTH,
+  Priority,
   TITLE_MAX_LENGTH,
   deriveTriggerType,
   validateTaskInput,
@@ -28,6 +35,7 @@ import {
 export interface TaskFormValues {
   title: string;
   notes: string;
+  priority: Priority;
   timeEnabled: boolean;
   locationEnabled: boolean;
   triggerTime: Date | null;
@@ -47,6 +55,7 @@ interface TaskFormProps {
 const defaultValues: TaskFormValues = {
   title: "",
   notes: "",
+  priority: DEFAULT_PRIORITY,
   timeEnabled: false,
   locationEnabled: false,
   triggerTime: null,
@@ -56,12 +65,6 @@ const defaultValues: TaskFormValues = {
   radiusMeters: 150,
 };
 
-/**
- * Normalizes a trigger time (which may arrive as a Date, an ISO string from
- * persisted data, null, or an unparseable value) into a valid Date or null.
- * The native DateTimePicker crashes if handed a string or an Invalid Date
- * (NaN timestamp), so every value reaching the picker must pass through here.
- */
 function toValidDate(value: Date | string | null | undefined): Date | null {
   if (value == null) return null;
   const date = value instanceof Date ? value : new Date(value);
@@ -81,6 +84,7 @@ export function TaskForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMounted = useRef(true);
 
@@ -96,60 +100,54 @@ export function TaskForm({
     setError(null);
   };
 
-  // Always derive a guaranteed-valid Date for any picker/display usage.
   const triggerDate = toValidDate(values.triggerTime);
 
-  const openDateTimePicker = () => {
+  const openDatePicker = () => {
     if (Platform.OS === "android") {
-      const initial = toValidDate(values.triggerTime) ?? new Date();
+      const initial = triggerDate ?? new Date();
       DateTimePickerAndroid.open({
         value: initial,
         mode: "date",
         onChange: (event, selectedDate) => {
           if (event.type !== "set" || !selectedDate) return;
-
-          const withDate = new Date(initial);
-          withDate.setFullYear(
+          const result = new Date(initial);
+          result.setFullYear(
             selectedDate.getFullYear(),
             selectedDate.getMonth(),
             selectedDate.getDate()
           );
-
-          // NOTE: do NOT pass `design: "material"` / `initialInputMode` here.
-          // Those route to the Material 3 MaterialTimePicker, which requires the
-          // host Activity theme to descend from Theme.MaterialComponents/Material3.
-          // This app uses Theme.AppCompat.DayNight.NoActionBar, so the Material
-          // picker throws IllegalArgumentException on the UI thread (uncatchable
-          // by the JS try/catch) and hard-crashes. The default AppCompat picker
-          // still supports AM/PM via is24Hour:false and a keyboard-entry toggle.
-          DateTimePickerAndroid.open({
-            value: withDate,
-            mode: "time",
-            is24Hour: false,
-            onChange: (timeEvent, selectedTime) => {
-              if (timeEvent.type !== "set" || !selectedTime) return;
-              const result = new Date(withDate);
-              result.setHours(
-                selectedTime.getHours(),
-                selectedTime.getMinutes(),
-                0,
-                0
-              );
-              update({ triggerTime: result });
-            },
-          });
+          update({ triggerTime: result });
         },
       });
       return;
     }
-
     setShowDatePicker(true);
+  };
+
+  const openTimePicker = () => {
+    if (Platform.OS === "android") {
+      const initial = triggerDate ?? new Date();
+      DateTimePickerAndroid.open({
+        value: initial,
+        mode: "time",
+        is24Hour: false,
+        onChange: (event, selectedTime) => {
+          if (event.type !== "set" || !selectedTime) return;
+          const result = new Date(initial);
+          result.setHours(selectedTime.getHours(), selectedTime.getMinutes(), 0, 0);
+          update({ triggerTime: result });
+        },
+      });
+      return;
+    }
+    setShowTimePicker(true);
   };
 
   const handleSubmit = async () => {
     const input: CreateTaskInput = {
       title: values.title,
       notes: values.notes || null,
+      priority: values.priority,
       timeEnabled: values.timeEnabled,
       locationEnabled: values.locationEnabled,
       triggerTime:
@@ -192,272 +190,299 @@ export function TaskForm({
   };
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Title ({values.title.length}/{TITLE_MAX_LENGTH})
-        </Text>
-        <TextInput
-          value={values.title}
-          onChangeText={(title) => update({ title })}
-          placeholder="Enter title of task"
-          placeholderTextColor={colors.textSecondary}
-          maxLength={TITLE_MAX_LENGTH}
-          style={[
-            styles.input,
-            {
-              color: colors.text,
-              borderColor: colors.border,
-              backgroundColor: colors.surface,
-            },
-          ]}
-        />
-      </View>
-
-      <View style={styles.field}>
-        <View style={styles.triggerHeader}>
-          <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 0 }]}>
-            Time reminder
-          </Text>
-          <Switch
-            value={values.timeEnabled}
-            onValueChange={(timeEnabled) => {
-              if (!timeEnabled) {
-                update({ timeEnabled: false, triggerTime: null });
-                setShowDatePicker(false);
-                return;
-              }
-              update({
-                timeEnabled: true,
-                triggerTime: toValidDate(values.triggerTime) ?? new Date(),
-              });
-            }}
-            trackColor={{ false: colors.border, true: colors.primaryMuted }}
-            thumbColor={values.timeEnabled ? colors.primary : colors.surface}
+    <View style={[styles.wrapper, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.titleBlock}>
+          <TextInput
+            value={values.title}
+            onChangeText={(title) => update({ title })}
+            placeholder="Task title"
+            placeholderTextColor={colors.textSecondary}
+            maxLength={TITLE_MAX_LENGTH}
+            style={[styles.titleInput, { color: colors.text }]}
           />
+          <Text style={[styles.counter, { color: colors.textSecondary }]}>
+            {values.title.length}/{TITLE_MAX_LENGTH}
+          </Text>
         </View>
-        {values.timeEnabled ? (
-          <>
-            <Pressable
-              onPress={openDateTimePicker}
-              style={[styles.pickerButton, { borderColor: colors.border }]}
-            >
-              <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-              <Text style={[styles.pickerText, { color: colors.text }]}>
-                {triggerDate
-                  ? triggerDate.toLocaleString()
-                  : "Select date and time"}
-              </Text>
-            </Pressable>
-            {showDatePicker && Platform.OS === "ios" && (
-              <View style={styles.iosDatePicker}>
-                <DateTimePicker
-                  value={triggerDate ?? new Date()}
-                  mode="datetime"
-                  display="spinner"
-                  onChange={(_, date) => {
-                    if (date) update({ triggerTime: date });
-                  }}
-                />
-              </View>
-            )}
-          </>
-        ) : (
-          <Text style={[styles.hint, { color: colors.textSecondary }]}>
-            Remind when this task is due
-          </Text>
-        )}
-      </View>
 
-      <View style={styles.field}>
-        <View style={styles.triggerHeader}>
-          <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 0 }]}>
-            Location reminder
-          </Text>
-          <Switch
-            value={values.locationEnabled}
-            onValueChange={(locationEnabled) => {
-              if (!locationEnabled) {
+        <PriorityPills
+          value={values.priority}
+          onChange={(priority) => update({ priority })}
+        />
+
+        <EchoCard style={styles.reminderCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Time Reminder
+            </Text>
+            <Switch
+              value={values.timeEnabled}
+              onValueChange={(timeEnabled) => {
+                if (!timeEnabled) {
+                  update({ timeEnabled: false, triggerTime: null });
+                  setShowDatePicker(false);
+                  setShowTimePicker(false);
+                  return;
+                }
                 update({
-                  locationEnabled: false,
-                  latitude: null,
-                  longitude: null,
-                  locationName: "",
+                  timeEnabled: true,
+                  triggerTime: triggerDate ?? new Date(),
                 });
-                return;
+              }}
+              trackColor={{ false: colors.border, true: colors.primaryMuted }}
+              thumbColor={values.timeEnabled ? colors.primary : colors.surface}
+            />
+          </View>
+          {values.timeEnabled && (
+            <View style={styles.dateTimeRow}>
+              <Pressable
+                onPress={openDatePicker}
+                style={[
+                  styles.dateField,
+                  { backgroundColor: colors.surfaceContainerLow },
+                ]}
+              >
+                <Text style={[styles.fieldText, { color: colors.text }]}>
+                  {triggerDate
+                    ? format(triggerDate, "MMMM dd, yyyy")
+                    : "Select date"}
+                </Text>
+                <Ionicons name="calendar" size={18} color={colors.primary} />
+              </Pressable>
+              <Pressable
+                onPress={openTimePicker}
+                style={[
+                  styles.dateField,
+                  { backgroundColor: colors.surfaceContainerLow },
+                ]}
+              >
+                <Text style={[styles.fieldText, { color: colors.text }]}>
+                  {triggerDate ? format(triggerDate, "hh:mm a") : "Select time"}
+                </Text>
+                <Ionicons name="time" size={18} color={colors.primary} />
+              </Pressable>
+            </View>
+          )}
+          {showDatePicker && Platform.OS === "ios" && (
+            <DateTimePicker
+              value={triggerDate ?? new Date()}
+              mode="date"
+              display="spinner"
+              onChange={(_, date) => {
+                if (date) update({ triggerTime: date });
+              }}
+            />
+          )}
+          {showTimePicker && Platform.OS === "ios" && (
+            <DateTimePicker
+              value={triggerDate ?? new Date()}
+              mode="time"
+              display="spinner"
+              onChange={(_, date) => {
+                if (date) update({ triggerTime: date });
+              }}
+            />
+          )}
+        </EchoCard>
+
+        <EchoCard style={styles.reminderCard}>
+          <View style={styles.cardHeader}>
+            <Ionicons name="location-outline" size={20} color={colors.primary} />
+            <Text style={[styles.cardTitle, { color: colors.text }]}>
+              Location Reminder
+            </Text>
+            <Switch
+              value={values.locationEnabled}
+              onValueChange={(locationEnabled) => {
+                if (!locationEnabled) {
+                  update({
+                    locationEnabled: false,
+                    latitude: null,
+                    longitude: null,
+                    locationName: "",
+                  });
+                  return;
+                }
+                update({ locationEnabled: true });
+              }}
+              trackColor={{ false: colors.border, true: colors.primaryMuted }}
+              thumbColor={
+                values.locationEnabled ? colors.primary : colors.surface
               }
-              update({ locationEnabled: true });
-            }}
-            trackColor={{ false: colors.border, true: colors.primaryMuted }}
-            thumbColor={values.locationEnabled ? colors.primary : colors.surface}
+            />
+          </View>
+          {values.locationEnabled && (
+            <>
+              <LocationPicker
+                latitude={values.latitude}
+                longitude={values.longitude}
+                radiusMeters={values.radiusMeters}
+                locationName={values.locationName}
+                onLocationChange={(latitude, longitude) =>
+                  update({ latitude, longitude })
+                }
+                onLocationNameChange={(locationName) =>
+                  update({ locationName })
+                }
+                onRadiusChange={(radiusMeters) => update({ radiusMeters })}
+              />
+              <View style={styles.radiusRow}>
+                <Text style={[styles.radiusLabel, { color: colors.textSecondary }]}>
+                  Radius
+                </Text>
+                <Text style={[styles.radiusValue, { color: colors.primary }]}>
+                  {values.radiusMeters}m
+                </Text>
+              </View>
+            </>
+          )}
+        </EchoCard>
+
+        <View style={styles.notesSection}>
+          <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>
+            Notes ({values.notes.length}/{NOTES_MAX_LENGTH})
+          </Text>
+          <TextInput
+            value={values.notes}
+            onChangeText={(notes) => update({ notes })}
+            placeholder="Add notes (optional)"
+            placeholderTextColor={colors.textSecondary}
+            maxLength={NOTES_MAX_LENGTH}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            style={[
+              styles.notesInput,
+              {
+                color: colors.text,
+                backgroundColor: colors.surface,
+              },
+            ]}
           />
         </View>
-        {values.locationEnabled ? (
-          <LocationPicker
-            latitude={values.latitude}
-            longitude={values.longitude}
-            radiusMeters={values.radiusMeters}
-            locationName={values.locationName}
-            onLocationChange={(latitude, longitude) =>
-              update({ latitude, longitude })
-            }
-            onLocationNameChange={(locationName) => update({ locationName })}
-            onRadiusChange={(radiusMeters) => update({ radiusMeters })}
-          />
-        ) : (
-          <Text style={[styles.hint, { color: colors.textSecondary }]}>
-            Remind when you arrive nearby
-          </Text>
+
+        {error && (
+          <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>
         )}
-      </View>
+      </ScrollView>
 
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>
-          Notes ({values.notes.length}/{NOTES_MAX_LENGTH})
-        </Text>
-        <TextInput
-          value={values.notes}
-          onChangeText={(notes) => update({ notes })}
-          placeholder="Add notes or description"
-          placeholderTextColor={colors.textSecondary}
-          maxLength={NOTES_MAX_LENGTH}
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-          style={[
-            styles.input,
-            styles.notesInput,
-            {
-              color: colors.text,
-              borderColor: colors.border,
-              backgroundColor: colors.surface,
-            },
-          ]}
-        />
+      <View
+        style={[
+          styles.footer,
+          { backgroundColor: colors.background, borderTopColor: colors.border },
+        ]}
+      >
+        <GhostButton label="Cancel" onPress={onCancel} />
+        <View style={styles.saveWrap}>
+          <PrimaryButton
+            label={submitLabel}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          />
+        </View>
       </View>
-
-      {error && (
-        <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>
-      )}
-
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onCancel}
-          style={({ pressed }) => [
-            styles.button,
-            styles.cancelButton,
-            { borderColor: colors.border, backgroundColor: colors.surface },
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={[styles.buttonText, { color: colors.textSecondary }]}>
-            Cancel
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-          style={({ pressed }) => [
-            styles.button,
-            styles.saveButton,
-            shadow.sm,
-            { backgroundColor: colors.primary, opacity: isSubmitting ? 0.6 : 1 },
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={[styles.buttonText, { color: colors.onPrimary }]}>
-            {submitLabel}
-          </Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
   },
   content: {
     padding: spacing.md,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.lg,
   },
-  field: {
+  titleBlock: {
     marginBottom: spacing.md,
   },
-  label: {
-    ...typography.label,
-    marginBottom: spacing.sm,
+  titleInput: {
+    ...typography.headlineLg,
+    fontSize: 28,
+    padding: 0,
   },
-  input: {
-    minHeight: layout.inputHeight,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    ...typography.body,
+  counter: {
+    ...typography.caption,
+    textAlign: "right",
+    marginTop: spacing.xs,
   },
-  notesInput: {
-    minHeight: 120,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    lineHeight: 22,
+  reminderCard: {
+    marginBottom: spacing.md,
   },
-  pickerButton: {
+  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    minHeight: layout.controlHeight,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  pickerText: {
-    ...typography.body,
+  cardTitle: {
+    ...typography.headlineMd,
     flex: 1,
   },
-  iosDatePicker: {
-    height: 216,
+  dateTimeRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
   },
-  triggerHeader: {
+  dateField: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    minHeight: layout.controlHeight,
   },
-  hint: {
-    ...typography.caption,
+  fieldText: {
+    ...typography.bodyMd,
+    flex: 1,
+  },
+  radiusRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: spacing.sm,
+  },
+  radiusLabel: {
+    ...typography.bodyMd,
+  },
+  radiusValue: {
+    ...typography.label,
+    fontFamily: "Inter_700Bold",
+    fontWeight: "700",
+  },
+  notesSection: {
+    marginBottom: spacing.md,
+  },
+  notesLabel: {
+    ...typography.labelSm,
+    letterSpacing: 0,
+    marginBottom: spacing.sm,
+  },
+  notesInput: {
+    minHeight: 100,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    ...typography.body,
+    lineHeight: 22,
   },
   error: {
     ...typography.caption,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  actions: {
+  footer: {
     flexDirection: "row",
-    gap: spacing.sm,
-    marginTop: spacing.xs,
-  },
-  button: {
-    flex: 1,
-    minHeight: layout.buttonHeight,
-    justifyContent: "center",
-    borderRadius: radius.md,
     alignItems: "center",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    gap: spacing.sm,
   },
-  cancelButton: {
-    borderWidth: 1,
-  },
-  saveButton: {},
-  pressed: {
-    opacity: 0.85,
-  },
-  buttonText: {
-    ...typography.label,
-    fontWeight: "600",
+  saveWrap: {
+    flex: 1,
   },
 });

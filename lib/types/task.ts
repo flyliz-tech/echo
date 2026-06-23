@@ -1,5 +1,19 @@
 export type TriggerType = "location" | "time" | "both" | "none";
 
+export type Priority = "low" | "medium" | "high" | "urgent";
+
+export const PRIORITY_META: Record<
+  Priority,
+  { label: string; dotColor: string }
+> = {
+  low: { label: "Low", dotColor: "#9CA3AF" },
+  medium: { label: "Medium", dotColor: "#4F46E5" },
+  high: { label: "High", dotColor: "#F59E0B" },
+  urgent: { label: "Urgent", dotColor: "#DC2626" },
+};
+
+export const DEFAULT_PRIORITY: Priority = "medium";
+
 export type SortMode =
   | "default"
   | "triggerTime"
@@ -10,6 +24,7 @@ export interface Task {
   id: string;
   title: string;
   notes: string | null;
+  priority: Priority;
   triggerType: TriggerType;
   latitude: number | null;
   longitude: number | null;
@@ -24,6 +39,7 @@ export interface Task {
 export interface CreateTaskInput {
   title: string;
   notes?: string | null;
+  priority?: Priority;
   triggerType?: TriggerType;
   timeEnabled?: boolean;
   locationEnabled?: boolean;

@@ -1,5 +1,5 @@
 export const DB_NAME = "echo.db";
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export const CREATE_TASKS_TABLE = `
   CREATE TABLE IF NOT EXISTS tasks (
@@ -52,4 +52,10 @@ export const MIGRATE_TASKS_V2 = `
 export const MIGRATE_TASKS_V3 = `
   ALTER TABLE tasks ADD COLUMN updated_at TEXT;
   UPDATE tasks SET updated_at = created_at WHERE updated_at IS NULL;
+`;
+
+export const MIGRATE_TASKS_V4 = `
+  ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium'
+    CHECK(priority IN ('low', 'medium', 'high', 'urgent'));
+  UPDATE tasks SET priority = 'medium' WHERE priority IS NULL;
 `;

@@ -23,10 +23,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { EchoCard } from "@/components/ui/EchoCard";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { TaskCard } from "@/components/TaskCard";
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, spacing, typography } from "@/constants/theme";
 import { hasTimeTrigger } from "@/lib/types/task";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -79,78 +80,92 @@ export default function CalendarScreen() {
     >
       <ScreenHeader title="Calendar" />
 
-      <View style={styles.monthHeader}>
-        <Pressable onPress={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
-        </Pressable>
-        <Text style={[styles.monthTitle, { color: colors.text }]}>
-          {format(currentMonth, "MMMM yyyy")}
-        </Text>
-        <Pressable onPress={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-          <Ionicons name="chevron-forward" size={24} color={colors.text} />
-        </Pressable>
-      </View>
-
-      <View style={styles.weekdayRow}>
-        {WEEKDAYS.map((day) => (
-          <Text
-            key={day}
-            style={[styles.weekday, { color: colors.textSecondary }]}
-          >
-            {day}
+      <EchoCard style={styles.calendarCard} elevated>
+        <View style={styles.monthHeader}>
+          <Pressable onPress={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <Ionicons name="chevron-back" size={24} color={colors.text} />
+          </Pressable>
+          <Text style={[styles.monthTitle, { color: colors.text }]}>
+            {format(currentMonth, "MMMM yyyy")}
           </Text>
-        ))}
-      </View>
+          <Pressable onPress={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+            <Ionicons name="chevron-forward" size={24} color={colors.text} />
+          </Pressable>
+        </View>
 
-      <View style={styles.grid}>
-        {calendarDays.map((day) => {
-          const key = format(day, "yyyy-MM-dd");
-          const inMonth = isSameMonth(day, currentMonth);
-          const selected = isSameDay(day, selectedDate);
-          const isToday = isSameDay(day, new Date());
-          const hasTasks = daysWithTasks.has(key);
-
-          return (
-            <Pressable
-              key={key}
-              onPress={() => setSelectedDate(day)}
-              style={styles.dayCell}
+        <View style={styles.weekdayRow}>
+          {WEEKDAYS.map((day) => (
+            <Text
+              key={day}
+              style={[styles.weekday, { color: colors.textSecondary }]}
             >
-              <View
-                style={[
-                  styles.dayInner,
-                  selected && { backgroundColor: colors.primaryMuted },
-                  isToday && !selected && {
-                    borderWidth: 1,
-                    borderColor: colors.primary,
-                  },
-                ]}
+              {day}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.grid}>
+          {calendarDays.map((day) => {
+            const key = format(day, "yyyy-MM-dd");
+            const inMonth = isSameMonth(day, currentMonth);
+            const selected = isSameDay(day, selectedDate);
+            const isToday = isSameDay(day, new Date());
+            const hasTasks = daysWithTasks.has(key);
+
+            return (
+              <Pressable
+                key={key}
+                onPress={() => setSelectedDate(day)}
+                style={styles.dayCell}
               >
-                <Text
+                <View
                   style={[
-                    styles.dayText,
-                    {
-                      color: inMonth ? colors.text : colors.textSecondary,
-                      opacity: inMonth ? 1 : 0.4,
-                    },
-                    (selected || isToday) && {
-                      color: colors.primary,
-                      fontWeight: "700",
-                    },
+                    styles.dayInner,
+                    selected && { backgroundColor: colors.primary },
+                    isToday &&
+                      !selected && {
+                        borderWidth: 2,
+                        borderColor: colors.primary,
+                      },
                   ]}
                 >
-                  {format(day, "d")}
-                </Text>
-              </View>
-              {hasTasks && (
-                <View
-                  style={[styles.dot, { backgroundColor: colors.primary }]}
-                />
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
+                  <Text
+                    style={[
+                      styles.dayText,
+                      {
+                        color: selected
+                          ? colors.onPrimary
+                          : inMonth
+                            ? colors.text
+                            : colors.textSecondary,
+                        opacity: inMonth ? 1 : 0.4,
+                      },
+                      isToday && !selected && {
+                        color: colors.primary,
+                        fontWeight: "700",
+                      },
+                    ]}
+                  >
+                    {format(day, "d")}
+                  </Text>
+                </View>
+                {hasTasks && (
+                  <View
+                    style={[
+                      styles.dot,
+                      {
+                        backgroundColor: selected
+                          ? colors.onPrimary
+                          : colors.primary,
+                      },
+                    ]}
+                  />
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+      </EchoCard>
 
       <Text style={[styles.sectionTitle, { color: colors.text }]}>
         {format(selectedDate, "EEEE, MMM d")}
@@ -181,6 +196,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: spacing.md,
+  },
+  calendarCard: {
+    marginBottom: spacing.md,
+    padding: spacing.md,
   },
   monthHeader: {
     flexDirection: "row",
@@ -242,7 +261,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   list: {
-    paddingBottom: spacing.lg,
+    paddingBottom: layout.tabBarHeight + spacing.lg,
   },
   emptyText: {
     ...typography.body,

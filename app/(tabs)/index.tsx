@@ -1,30 +1,77 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { format, isSameDay, parseISO } from "date-fns";
+import { useMemo, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useShallow } from "zustand/react/shallow";
 
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { DateSlider } from "@/components/DateSlider";
+import { HomeGreeting } from "@/components/HomeGreeting";
+import { LocationPermissionBanner } from "@/components/LocationPermissionBanner";
+import { MapPreviewCard } from "@/components/MapPreviewCard";
 import { SearchBar } from "@/components/SearchBar";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { TaskCard } from "@/components/TaskCard";
 import { TaskSortToggle } from "@/components/TaskSortToggle";
 import { useTheme } from "@/hooks/useTheme";
-import { radius, spacing, typography } from "@/constants/theme";
+import { layout, radius, spacing, typography } from "@/constants/theme";
 import { selectFilteredTasks, useTaskStore } from "@/lib/store/taskStore";
+import { Task, SortMode } from "@/lib/types/task";
+
+function filterByDate(tasks: Task[], sortMode: SortMode, selectedDate: Date) {
+  if (sortMode !== "triggerTime" && sortMode !== "showCompleted") {
+    return tasks;
+  }
+  return tasks.filter((task) => {
+    if (sortMode === "showCompleted") {
+      return isSameDay(parseISO(task.createdAt), selectedDate);
+    }
+    if (task.triggerTime) {
+      return isSameDay(parseISO(task.triggerTime), selectedDate);
+    }
+    return false;
+  });
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [searchFocused, setSearchFocused] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const sortMode = useTaskStore((s) => s.sortMode);
   const setSortMode = useTaskStore((s) => s.setSortMode);
   const searchQuery = useTaskStore((s) => s.searchQuery);
   const setSearchQuery = useTaskStore((s) => s.setSearchQuery);
-  const tasks = useTaskStore(useShallow(selectFilteredTasks));
+  const baseTasks = useTaskStore(useShallow(selectFilteredTasks));
   const toggleComplete = useTaskStore((s) => s.toggleComplete);
   const deleteTasks = useTaskStore((s) => s.deleteTasks);
   const isSearching = searchFocused || searchQuery.length > 0;
+
+  const tasks = useMemo(
+    () => filterByDate(baseTasks, sortMode, selectedDate),
+    [baseTasks, sortMode, selectedDate]
+  );
+
+  const daysWithTasks = useMemo(() => {
+    const set = new Set<string>();
+    for (const task of baseTasks) {
+      if (sortMode === "showCompleted") {
+        set.add(format(parseISO(task.createdAt), "yyyy-MM-dd"));
+      } else if (task.triggerTime) {
+        set.add(format(parseISO(task.triggerTime), "yyyy-MM-dd"));
+      }
+    }
+    return set;
+  }, [baseTasks, sortMode]);
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -42,11 +89,8 @@ export default function HomeScreen() {
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -77,6 +121,49 @@ export default function HomeScreen() {
     );
   };
 
+  const showDateSlider =
+    !selectionMode &&
+    !isSearching &&
+    (sortMode === "triggerTime" || sortMode === "showCompleted");
+
+  const listHeader = (
+    <>
+      {!selectionMode && (
+        <>
+          <LocationPermissionBanner />
+          <HomeGreeting />
+          <SearchBar
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            active={isSearching}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+          />
+          <TaskSortToggle value={sortMode} onChange={setSortMode} />
+          {showDateSlider && (
+            <DateSlider
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+              daysWithTasks={daysWithTasks}
+            />
+          )}
+          {!isSearching && (
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionLabel, { color: colors.outline }]}>
+                YOUR TASKS
+              </Text>
+              <Pressable onPress={() => router.push("/(tabs)/search")}>
+                <Text style={[styles.seeAll, { color: colors.primary }]}>
+                  See All
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </>
+      )}
+    </>
+  );
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -86,32 +173,20 @@ export default function HomeScreen() {
         <ScreenHeader
           title={`${selectedIds.size} selected`}
           left={
-            <Pressable
-              onPress={exitSelection}
-              hitSlop={8}
-              accessibilityLabel="Cancel selection"
-            >
+            <Pressable onPress={exitSelection} hitSlop={8}>
               <Ionicons name="close" size={24} color={colors.text} />
             </Pressable>
           }
           right={
             <>
-              <Pressable
-                onPress={toggleSelectAll}
-                hitSlop={8}
-                accessibilityLabel="Select all"
-              >
+              <Pressable onPress={toggleSelectAll} hitSlop={8}>
                 <Ionicons
                   name={allSelected ? "checkbox" : "square-outline"}
                   size={24}
                   color={colors.primary}
                 />
               </Pressable>
-              <Pressable
-                onPress={confirmDelete}
-                hitSlop={8}
-                accessibilityLabel="Delete selected"
-              >
+              <Pressable onPress={confirmDelete} hitSlop={8}>
                 <Ionicons name="trash-outline" size={24} color={colors.danger} />
               </Pressable>
             </>
@@ -119,37 +194,29 @@ export default function HomeScreen() {
         />
       ) : (
         <ScreenHeader
-          title="Echo"
+          wordmark
           right={
             <Pressable
               onPress={() => router.push("/settings")}
               hitSlop={8}
               accessibilityLabel="Settings"
             >
-              <Ionicons name="settings-outline" size={24} color={colors.text} />
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={colors.textVariant}
+              />
             </Pressable>
           }
         />
-      )}
-
-      {!selectionMode && (
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          active={isSearching}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-        />
-      )}
-
-      {!selectionMode && !isSearching && (
-        <TaskSortToggle value={sortMode} onChange={setSortMode} />
       )}
 
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={!selectionMode && !isSearching ? <MapPreviewCard /> : null}
         ListEmptyComponent={
           <View style={styles.empty}>
             {searchQuery ? (
@@ -202,7 +269,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   list: {
-    paddingBottom: spacing.lg,
+    paddingBottom: layout.tabBarHeight + spacing.xl,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.sm,
+  },
+  sectionLabel: {
+    ...typography.labelSm,
+    letterSpacing: 1.2,
+  },
+  seeAll: {
+    ...typography.labelSm,
+    letterSpacing: 0,
   },
   empty: {
     paddingTop: spacing.xl * 2,

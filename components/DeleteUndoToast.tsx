@@ -1,8 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTheme } from "@/hooks/useTheme";
-import { radius, shadow, spacing, typography } from "@/constants/theme";
+import { elevationStyles, radius, spacing, typography } from "@/constants/theme";
 
 interface DeleteUndoToastProps {
   taskTitle: string;
@@ -16,15 +15,15 @@ export function DeleteUndoToast({ taskTitle, onUndo }: DeleteUndoToastProps) {
     <View
       style={[
         styles.container,
-        { backgroundColor: colors.text, shadowColor: colors.shadow },
+        { backgroundColor: colors.toastSurface },
+        elevationStyles.level2,
       ]}
     >
-      <Text style={[styles.message, { color: colors.surface }]} numberOfLines={1}>
-        Deleted &quot;{taskTitle}&quot;
+      <Text style={[styles.message, { color: colors.onToast }]} numberOfLines={1}>
+        Task deleted
       </Text>
       <Pressable onPress={onUndo} style={styles.undoButton}>
-        <Text style={[styles.undoText, { color: colors.primary }]}>Undo</Text>
-        <Ionicons name="arrow-undo" size={16} color={colors.primary} />
+        <Text style={[styles.undoText, { color: colors.undo }]}>UNDO</Text>
       </Pressable>
     </View>
   );
@@ -33,7 +32,7 @@ export function DeleteUndoToast({ taskTitle, onUndo }: DeleteUndoToastProps) {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 90,
+    bottom: 100,
     left: spacing.md,
     right: spacing.md,
     flexDirection: "row",
@@ -41,22 +40,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    borderRadius: radius.md,
-    ...shadow.md,
+    borderRadius: radius.lg,
   },
   message: {
-    ...typography.body,
+    ...typography.bodyMd,
     flex: 1,
-    fontSize: 14,
   },
   undoButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
     marginLeft: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
   undoText: {
-    ...typography.label,
-    fontWeight: "600",
+    ...typography.labelSm,
+    letterSpacing: 1,
   },
 });

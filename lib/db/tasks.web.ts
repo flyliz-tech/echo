@@ -2,6 +2,7 @@ import * as Crypto from "expo-crypto";
 
 import {
   CreateTaskInput,
+  DEFAULT_PRIORITY,
   DEFAULT_RADIUS_METERS,
   Task,
   UpdateTaskInput,
@@ -29,6 +30,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     id,
     title: input.title.trim(),
     notes: input.notes?.trim() || null,
+    priority: input.priority ?? DEFAULT_PRIORITY,
     triggerType,
     latitude: triggerFields.latitude,
     longitude: triggerFields.longitude,
@@ -58,6 +60,7 @@ export async function updateTask(
       input.notes !== undefined
         ? input.notes?.trim() || null
         : existing.notes,
+    priority: input.priority ?? existing.priority,
     latitude: input.latitude !== undefined ? input.latitude : existing.latitude,
     longitude:
       input.longitude !== undefined ? input.longitude : existing.longitude,
@@ -81,6 +84,7 @@ export async function updateTask(
     ...existing,
     title: mergedInput.title!,
     notes: mergedInput.notes ?? null,
+    priority: mergedInput.priority ?? existing.priority,
     latitude: triggerFields.latitude,
     longitude: triggerFields.longitude,
     radiusMeters: mergedInput.radiusMeters ?? existing.radiusMeters,

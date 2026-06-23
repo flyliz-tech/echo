@@ -1,8 +1,15 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
+import { EchoCheckbox } from "@/components/ui/EchoCheckbox";
+import { TriggerChip } from "@/components/ui/TriggerChip";
+import { EchoCard } from "@/components/ui/EchoCard";
 import { useTheme } from "@/hooks/useTheme";
-import { radius, shadow, spacing, typography } from "@/constants/theme";
+import { spacing, typography } from "@/constants/theme";
 import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 
@@ -24,138 +31,103 @@ export function TaskCard({
   selected = false,
 }: TaskCardProps) {
   const { colors } = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const cardStyle = [
+    styles.card,
+    selected && {
+      backgroundColor: colors.primaryMuted,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+    },
+    task.isCompleted && !selected ? styles.completed : undefined,
+  ];
 
   return (
-    <View
-      style={[
-        styles.card,
-        !task.isCompleted && shadow.sm,
-        {
-          backgroundColor: selected ? colors.primaryMuted : colors.surface,
-          borderColor: selected ? colors.primary : colors.border,
-          borderWidth: selected ? 1.5 : 1,
-          shadowColor: colors.shadow,
-          opacity: task.isCompleted && !selected ? 0.6 : 1,
-        },
-      ]}
-    >
-      <Pressable
-        onPress={selectionMode ? onPress : onToggleComplete}
-        onLongPress={onLongPress}
-        delayLongPress={300}
-        hitSlop={12}
-        style={styles.checkbox}
-        accessibilityRole="checkbox"
-        accessibilityState={{
-          checked: selectionMode ? selected : task.isCompleted,
-        }}
-      >
-        <Ionicons
-          name={
-            selectionMode
-              ? selected
-                ? "checkmark-circle"
-                : "ellipse-outline"
-              : task.isCompleted
-                ? "checkbox"
-                : "square-outline"
-          }
-          size={24}
-          color={
-            selectionMode
-              ? selected
-                ? colors.primary
-                : colors.textSecondary
-              : task.isCompleted
-                ? colors.success
-                : colors.textSecondary
-          }
+    <Animated.View style={animatedStyle}>
+      <EchoCard style={cardStyle} elevated={!task.isCompleted}>
+        <View style={styles.row}>
+        <EchoCheckbox
+          checked={task.isCompleted}
+          selected={selected}
+          selectionMode={selectionMode}
+          onPress={selectionMode ? onPress : onToggleComplete}
+          onLongPress={onLongPress}
         />
-      </Pressable>
 
-      <Pressable
-        onPress={onPress}
-        onLongPress={onLongPress}
-        delayLongPress={300}
-        style={({ pressed }) => [
-          styles.content,
-          pressed && !task.isCompleted && styles.contentPressed,
-        ]}
-      >
-        <Text
-          style={[
-            styles.title,
-            { color: colors.text },
-            task.isCompleted && styles.completedTitle,
-          ]}
-          numberOfLines={2}
+        <Pressable
+          onPress={onPress}
+          onLongPress={onLongPress}
+          delayLongPress={300}
+          onPressIn={() => {
+            scale.value = withSpring(0.98, { damping: 15 });
+          }}
+          onPressOut={() => {
+            scale.value = withSpring(1, { damping: 15 });
+          }}
+          style={styles.content}
         >
-          {task.title}
-        </Text>
+          <Text
+            style={[
+              styles.title,
+              { color: colors.text },
+              task.isCompleted && styles.completedTitle,
+            ]}
+            numberOfLines={2}
+          >
+            {task.title}
+          </Text>
 
-        {hasTimeTrigger(task) && task.triggerTime && (
-          <View style={styles.row}>
-            <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
-            <Text style={[styles.detail, { color: colors.textSecondary }]}>
-              {formatTriggerTime(task.triggerTime)}
-            </Text>
+          <View style={styles.chips}>
+            {hasTimeTrigger(task) && task.triggerTime && (
+              <TriggerChip
+                type="time"
+                label={formatTriggerTime(task.triggerTime)}
+              />
+            )}
+            {hasLocationTrigger(task) && task.locationName && (
+              <TriggerChip type="location" label={task.locationName} />
+            )}
           </View>
-        )}
-
-        {hasLocationTrigger(task) && task.locationName && (
-          <View style={styles.row}>
-            <Ionicons
-              name="location-outline"
-              size={16}
-              color={colors.textSecondary}
-            />
-            <Text
-              style={[styles.detail, { color: colors.textSecondary }]}
-              numberOfLines={1}
-            >
-              {task.locationName}
-            </Text>
-          </View>
-        )}
-      </Pressable>
-    </View>
+        </Pressable>
+        </View>
+      </EchoCard>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+  },
+  row: {
     flexDirection: "row",
     alignItems: "flex-start",
-    padding: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    marginBottom: spacing.sm,
     gap: spacing.sm,
-  },
-  checkbox: {
-    paddingTop: 2,
   },
   content: {
     flex: 1,
     gap: spacing.xs,
   },
-  contentPressed: {
-    opacity: 0.9,
-  },
   title: {
-    ...typography.heading,
+    ...typography.headlineMd,
     fontSize: 16,
   },
   completedTitle: {
     textDecorationLine: "line-through",
+    opacity: 0.6,
   },
-  row: {
+  completed: {
+    opacity: 0.6,
+  },
+  chips: {
     flexDirection: "row",
-    alignItems: "center",
+    flexWrap: "wrap",
     gap: spacing.xs,
-  },
-  detail: {
-    ...typography.caption,
-    flex: 1,
   },
 });

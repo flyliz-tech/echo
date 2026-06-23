@@ -19,15 +19,18 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MapPin } from "@/components/MapPin";
+import { EchoCard } from "@/components/ui/EchoCard";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { TriggerChip } from "@/components/ui/TriggerChip";
 import { useTheme } from "@/hooks/useTheme";
-import { layout, radius, shadow, spacing, typography } from "@/constants/theme";
+import { elevationStyles, layout, radius, spacing, typography } from "@/constants/theme";
 import {
   DEFAULT_CENTER,
   latitudeDeltaToZoom,
   MAP_STYLE_URL,
   RECENTER_ZOOM,
 } from "@/constants/map";
-import { Task, hasLocationTrigger } from "@/lib/types/task";
+import { Task, hasLocationTrigger, hasTimeTrigger } from "@/lib/types/task";
 import { formatTriggerTime } from "@/lib/utils/formatTaskTime";
 import { useTaskStore } from "@/lib/store/taskStore";
 
@@ -126,44 +129,40 @@ export default function MapTabScreenMapLibre() {
             anchor="bottom"
             onPress={() => setSelectedTask(task)}
           >
-            <MapPin size={32} />
+            <MapPin size={32} triggerType={task.triggerType} />
           </Marker>
         ))}
       </Map>
 
       {selectedTask && (
-        <SafeAreaView style={styles.tooltipWrapper} edges={["bottom"]}>
-          <View
-            style={[
-              styles.tooltip,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <Text style={[styles.tooltipTitle, { color: colors.text }]}>
+        <SafeAreaView style={styles.sheetWrapper} edges={["bottom"]}>
+          <EchoCard style={styles.sheet} elevated>
+            <View style={[styles.handle, { backgroundColor: colors.outlineVariant }]} />
+            <Text style={[styles.sheetTitle, { color: colors.text }]}>
               {selectedTask.title}
             </Text>
-            {selectedTask.triggerTime && (
-              <Text style={[styles.tooltipDetail, { color: colors.textSecondary }]}>
-                {formatTriggerTime(selectedTask.triggerTime)}
-              </Text>
-            )}
-            {selectedTask.locationName && (
-              <Text style={[styles.tooltipDetail, { color: colors.textSecondary }]}>
-                {selectedTask.locationName}
-              </Text>
-            )}
-            <Pressable
+            <View style={styles.chips}>
+              {hasTimeTrigger(selectedTask) && selectedTask.triggerTime && (
+                <TriggerChip
+                  type="time"
+                  label={formatTriggerTime(selectedTask.triggerTime)}
+                />
+              )}
+              {hasLocationTrigger(selectedTask) && selectedTask.locationName && (
+                <TriggerChip
+                  type="location"
+                  label={selectedTask.locationName}
+                />
+              )}
+            </View>
+            <PrimaryButton
+              label="View task →"
               onPress={() => {
                 router.push(`/task/${selectedTask.id}`);
                 setSelectedTask(null);
               }}
-              style={[styles.viewButton, { backgroundColor: colors.primary }]}
-            >
-              <Text style={[styles.viewButtonText, { color: colors.onPrimary }]}>
-                View task
-              </Text>
-            </Pressable>
-          </View>
+            />
+          </EchoCard>
         </SafeAreaView>
       )}
 
@@ -203,37 +202,33 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
   },
-  tooltipWrapper: {
+  sheetWrapper: {
     position: "absolute",
-    bottom: 0,
+    bottom: layout.tabBarHeight,
     left: 0,
     right: 0,
     padding: spacing.md,
   },
-  tooltip: {
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    ...shadow.md,
+  sheet: {
+    paddingTop: spacing.sm,
   },
-  tooltipTitle: {
-    ...typography.heading,
-    marginBottom: spacing.xs,
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: spacing.md,
   },
-  tooltipDetail: {
-    ...typography.caption,
-    marginBottom: spacing.xs,
+  sheetTitle: {
+    ...typography.headlineLg,
+    fontSize: 22,
+    marginBottom: spacing.sm,
   },
-  viewButton: {
-    marginTop: spacing.sm,
-    minHeight: layout.minTouchTarget,
-    justifyContent: "center",
-    borderRadius: radius.md,
-    alignItems: "center",
-  },
-  viewButtonText: {
-    ...typography.label,
-    fontWeight: "600",
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.xs,
+    marginBottom: spacing.md,
   },
   emptyBanner: {
     position: "absolute",
@@ -243,14 +238,14 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.md,
     alignItems: "center",
-    ...shadow.sm,
+    ...elevationStyles.level1,
   },
   emptyText: {
     ...typography.caption,
   },
   recenterButton: {
     position: "absolute",
-    top: spacing.md,
+    bottom: layout.tabBarHeight + spacing.xl * 2,
     right: spacing.md,
     width: 44,
     height: 44,
@@ -258,7 +253,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    ...shadow.md,
+    ...elevationStyles.level2,
   },
   userDotRing: {
     width: 22,

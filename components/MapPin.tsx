@@ -1,41 +1,51 @@
 import { StyleSheet, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
+import { useEffect } from "react";
 
+import { TriggerBadge } from "@/components/ui/TriggerBadge";
 import { useTheme } from "@/hooks/useTheme";
+import type { TriggerType } from "@/lib/types/task";
 
 interface MapPinProps {
   size?: number;
+  triggerType?: TriggerType;
 }
 
-export function MapPin({ size = 24 }: MapPinProps) {
+export function MapPin({ size = 32, triggerType = "location" }: MapPinProps) {
   const { colors } = useTheme();
-  const head = size;
-  const stem = size * 0.45;
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    pulse.value = withRepeat(withTiming(1.4, { duration: 1200 }), -1, true);
+  }, [pulse]);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+    opacity: 2 - pulse.value,
+  }));
 
   return (
-    <View style={[styles.container, { width: head, height: head + stem }]}>
-      <View
+    <View style={[styles.container, { width: size, height: size + 8 }]}>
+      <Animated.View
         style={[
-          styles.head,
+          styles.pulse,
+          pulseStyle,
           {
-            width: head,
-            height: head,
-            borderRadius: head / 2,
-            backgroundColor: colors.primary,
-            borderColor: "#FFFFFF",
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: colors.primaryMuted,
           },
         ]}
       />
-      <View
-        style={[
-          styles.stem,
-          {
-            width: 2,
-            height: stem,
-            backgroundColor: colors.primary,
-            marginTop: -2,
-          },
-        ]}
-      />
+      <View style={styles.badgeWrap}>
+        <TriggerBadge triggerType={triggerType} size={size * 0.75} />
+      </View>
     </View>
   );
 }
@@ -43,9 +53,13 @@ export function MapPin({ size = 24 }: MapPinProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    justifyContent: "flex-end",
   },
-  head: {
-    borderWidth: 2,
+  pulse: {
+    position: "absolute",
+    bottom: 4,
   },
-  stem: {},
+  badgeWrap: {
+    marginBottom: 2,
+  },
 });
