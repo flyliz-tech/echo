@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Echo Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#1a1a2e",
+                    "tertiary-fixed-dim": "#4fdbc8",
+                    "primary-fixed": "#e2dfff",
+                    "primary": "#3525cd",
+                    "on-secondary-fixed-variant": "#653e00",
+                    "tertiary-container": "#006d62",
+                    "primary-container": "#4f46e5",
+                    "inverse-primary": "#c3c0ff",
+                    "background": "#fcf8ff",
+                    "surface-container-highest": "#e2e0fc",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e8e5ff",
+                    "secondary-container": "#fea619",
+                    "tertiary": "#00534a",
+                    "on-surface-variant": "#464555",
+                    "surface": "#fcf8ff",
+                    "on-tertiary-fixed": "#00201c",
+                    "inverse-on-surface": "#f2efff",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "on-tertiary-container": "#69f1de",
+                    "secondary": "#855300",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "outline": "#777587",
+                    "on-primary-container": "#dad7ff",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#2f2e43",
+                    "on-primary-fixed": "#0f0069",
+                    "surface-dim": "#dad7f3",
+                    "outline-variant": "#c7c4d8",
+                    "on-secondary-container": "#684000",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#71f8e4",
+                    "secondary-fixed-dim": "#ffb95f",
+                    "on-surface": "#1a1a2e",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#efecff",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#ffddb8",
+                    "surface-bright": "#fcf8ff",
+                    "on-secondary-fixed": "#2a1700",
+                    "surface-container-low": "#f5f2ff",
+                    "surface-tint": "#4d44e3",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e2e0fc",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "base": "4px",
+                    "stack-gap": "12px",
+                    "sm": "12px",
+                    "md": "16px",
+                    "container-padding": "16px",
+                    "xs": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "display": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-lg": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #F7F8FC;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .carousel-container {
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .carousel-slide {
+            scroll-snap-align: center;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, theme('colors.primary'), theme('colors.tertiary-container'));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-gradient {
+            background: linear-gradient(135deg, theme('colors.primary-container'), theme('colors.primary'));
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Permission Primer Animations */
+        .primer-enter {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .primer-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface h-screen flex flex-col overflow-hidden relative">
+<!-- Top Action Bar (Skip) -->
+<div class="w-full flex justify-end p-container-padding pt-safe-top absolute top-0 z-10">
+<button class="text-on-surface-variant font-label-sm text-label-sm px-4 py-2 hover:bg-surface-variant/50 rounded-full transition-colors" id="skipBtn">
+            Skip
+        </button>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col w-full h-full relative">
+<!-- Carousel Viewport -->
+<div class="flex-1 w-full flex overflow-x-auto carousel-container snap-x snap-mandatory pt-20 pb-8" id="carousel">
+<!-- Slide 1 -->
+<div class="carousel-slide min-w-full w-full flex flex-col items-center justify-center px-container-padding">
+<div class="w-64 h-64 mb-8 relative">
+<img alt="" class="w-full h-full object-contain drop-shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFncNC2r_tl2u7YxlWJ83XKO4rPxH-_LokQ1-hkIO6_sAegV8XOK93FWFGKkrPl2lck7ciqu7jnI797PBuOXvP-Rr6bDE75RXIHX4HtQ0RfNzns-BwwJ7k87sANY-gPrqC-JEpJxXufDHah9oS1enON9oy1K05JUCLvX42gzwjV6HP_-lh_0izlHmIAddr1xbJ9tZ01o0t9vx__ZpJMy_yXmgqObgHQvFPjr-4AdtOznnw3iso8OINIwWQ6_IvVNOXV2lVxGhrXAw"/>
+</div>
+<div class="text-center max-w-xs space-y-md">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Reminders that find you</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Get notified exactly where you need to be.</p>
+</div>
+</div>
+<!-- Slide 2 -->
+<div class="carousel-slide min-w-full w-full flex flex-col items-center justify-center px-container-padding">
+<div class="w-64 h-64 mb-8 relative">
+<img alt="" class="w-full h-full object-contain drop-shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_3KNfqdRZNp2oZrDuZfOSnXLXoygq_osIuvWFQORPA1IekN0zyvNQYaAnQ01DcWjUkkVi_D5OdRbslvXy4ITUbjqdZDAkkdhli9D8c_at8OvteHN_QVuHui_7bIjP584YLX6MOzThMiPyi1Biunh1olLW4hCYaCGbhFlW13Z2C9vyG6T3M7oGzMkLbGQcMQHIVlpPoQmAGIgYg3yA7MP3k6uzrv-WP14KwK8iKJN6wzVnso2VgC4uYsKUchBcg85J_0YIS9Lq8Vw"/>
+</div>
+<div class="text-center max-w-xs space-y-md">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Right time, right place</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Contextual alerts that blend your schedule with your surroundings.</p>
+</div>
+</div>
+<!-- Slide 3 -->
+<div class="carousel-slide min-w-full w-full flex flex-col items-center justify-center px-container-padding">
+<div class="w-64 h-64 mb-8 relative">
+<img alt="" class="w-full h-full object-contain drop-shadow-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ2NB1slkVMp8OIxqMcZw_cErN_ZGefMB63CYUGi1xStVTAF1uL1x1Qqx4PLhsaVw_41zMIUOAwZGAJ2WFY62vbjVYnJi7Tox5g4HlFuN7v7IqrYW4YBzyNIWxjzlrLnApJeaTQQZkDte_knBH1ZE6EXIPjEg_mF88rXTNWokBMvpF9hBBDeptz1biMwe3mNUcZ2R7XZOd_yqzHaq36lrWCU2gJEoyHbyiBqpNA80jAith1Hageoei-3TiTYKmnLjyBgM81uBaj10"/>
+</div>
+<div class="text-center max-w-xs space-y-md">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Works offline</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your data stays on your device. No accounts, no tracking, just tasks.</p>
+</div>
+</div>
+<!-- Final State: Permissions Primer -->
+<div class="carousel-slide min-w-full w-full flex flex-col items-center justify-center px-container-padding pb-20">
+<div class="w-full max-w-sm space-y-xl">
+<div class="text-center mb-8">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Enable Echo</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">To work its magic, Echo needs a few permissions.</p>
+</div>
+<!-- Location Primer Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex gap-md items-start primer-enter" style="transition-delay: 100ms;">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Location (Always)</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">We use your location to trigger reminders as you arrive or leave.</p>
+</div>
+</div>
+<!-- Notification Primer Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex gap-md items-start primer-enter" style="transition-delay: 200ms;">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Notifications</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Get timely alerts so you never miss a beat.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Controls Area -->
+<div class="w-full px-container-padding pb-10 pt-4 bg-gradient-to-t from-[#F7F8FC] via-[#F7F8FC] to-transparent z-10 flex flex-col items-center">
+<!-- Indicators -->
+<div class="flex gap-2 mb-8 transition-opacity duration-300" id="indicators">
+<div class="indicator w-2 h-2 rounded-full bg-primary transition-all duration-300 w-6"></div>
+<div class="indicator w-2 h-2 rounded-full bg-outline-variant transition-all duration-300"></div>
+<div class="indicator w-2 h-2 rounded-full bg-outline-variant transition-all duration-300"></div>
+<div class="indicator w-2 h-2 rounded-full bg-outline-variant transition-all duration-300"></div>
+</div>
+<!-- Next / Get Started Button -->
+<button class="w-full max-w-sm h-14 rounded-full font-headline-md text-headline-md text-white cta-gradient flex items-center justify-center transition-transform active:scale-95 duration-200" id="mainBtn">
+<span id="btnText">Next</span>
+<span class="material-symbols-outlined ml-2" id="btnIcon" style="font-size: 20px;">arrow_forward</span>
+</button>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.getElementById('carousel');
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.indicator');
+            const mainBtn = document.getElementById('mainBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const skipBtn = document.getElementById('skipBtn');
+            const indicatorsContainer = document.getElementById('indicators');
+            const primers = document.querySelectorAll('.primer-enter');
+            
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            const updateUI = (index) => {
+                // Update Indicators
+                indicators.forEach((ind, i) => {
+                    if (i === index) {
+                        ind.classList.remove('bg-outline-variant', 'w-2');
+                        ind.classList.add('bg-primary', 'w-6');
+                    } else {
+                        ind.classList.remove('bg-primary', 'w-6');
+                        ind.classList.add('bg-outline-variant', 'w-2');
+                    }
+                });
+
+                // Update Button & Skip
+                if (index === totalSlides - 1) {
+                    btnText.textContent = "Get started";
+                    btnIcon.style.display = 'none';
+                    skipBtn.style.opacity = '0';
+                    skipBtn.style.pointerEvents = 'none';
+                    indicatorsContainer.style.opacity = '0';
+                    
+                    // Trigger primer animations
+                    primers.forEach(p => p.classList.add('primer-enter-active'));
+                } else {
+                    btnText.textContent = "Next";
+                    btnIcon.style.display = 'inline-block';
+                    skipBtn.style.opacity = '1';
+                    skipBtn.style.pointerEvents = 'auto';
+                    indicatorsContainer.style.opacity = '1';
+                    
+                    // Reset primer animations
+                    primers.forEach(p => p.classList.remove('primer-enter-active'));
+                }
+                currentSlide = index;
+            };
+
+            // Scroll Event Listener
+            carousel.addEventListener('scroll', () => {
+                const scrollPosition = carousel.scrollLeft;
+                const slideWidth = carousel.clientWidth;
+                // Add a small threshold (slideWidth / 2) to trigger earlier during swipe
+                const newIndex = Math.round(scrollPosition / slideWidth);
+                
+                if (newIndex !== currentSlide) {
+                    updateUI(newIndex);
+                }
+            });
+
+            // Button Clicks
+            mainBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    // Go to next slide
+                    carousel.scrollTo({
+                        left: (currentSlide + 1) * carousel.clientWidth,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    // Action for Get Started (e.g., navigate to main app)
+                    // console.log("Get Started clicked - request permissions & navigate");
+                    mainBtn.classList.add('scale-95', 'opacity-80');
+                    setTimeout(() => mainBtn.classList.remove('scale-95', 'opacity-80'), 200);
+                }
+            });
+
+            skipBtn.addEventListener('click', () => {
+                // Scroll directly to final slide
+                carousel.scrollTo({
+                    left: (totalSlides - 1) * carousel.clientWidth,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Initial UI setup
+            updateUI(0);
+        });
+    </script>
+</body></html>

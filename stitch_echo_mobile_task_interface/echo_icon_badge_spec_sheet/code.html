@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Echo Icon Badges Spec Sheet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#777587",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#c3c0ff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf8ff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "background": "#fcf8ff",
+                        "primary": "#3525cd",
+                        "surface-container-low": "#f5f2ff",
+                        "on-primary-fixed": "#0f0069",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f2efff",
+                        "primary-container": "#4f46e5",
+                        "tertiary-fixed": "#71f8e4",
+                        "on-secondary-fixed": "#2a1700",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "surface-container-highest": "#e2e0fc",
+                        "on-primary-container": "#dad7ff",
+                        "tertiary-container": "#006d62",
+                        "surface-container": "#efecff",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-fixed-variant": "#005048",
+                        "on-secondary-container": "#684000",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e8e5ff",
+                        "tertiary-fixed-dim": "#4fdbc8",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "secondary-container": "#fea619",
+                        "primary-fixed": "#e2dfff",
+                        "on-surface": "#1a1a2e",
+                        "inverse-surface": "#2f2e43",
+                        "secondary-fixed": "#ffddb8",
+                        "secondary": "#855300",
+                        "on-tertiary-fixed": "#00201c",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1a1a2e",
+                        "surface-variant": "#e2e0fc",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#69f1de",
+                        "tertiary": "#00534a",
+                        "surface-tint": "#4d44e3",
+                        "surface-dim": "#dad7f3",
+                        "surface": "#fcf8ff",
+                        "outline-variant": "#c7c4d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "32px",
+                        "stack-gap": "12px",
+                        "md": "16px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "xs": "8px",
+                        "container-padding": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-xl">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background w-full top-0 sticky z-50">
+<div class="flex items-center justify-between px-container-padding h-16 w-full max-w-5xl mx-auto">
+<button class="text-primary dark:text-inverse-primary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-inverse-primary">Echo</h1>
+<button class="text-primary dark:text-inverse-primary hover:bg-surface-container-low transition-colors rounded-full p-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</div>
+</header>
+<main class="px-container-padding pt-lg max-w-5xl mx-auto space-y-xl">
+<div class="space-y-sm">
+<h2 class="font-display text-display text-primary">Icon Badges Spec</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Design definitions and integration examples for Echo's contextual trigger badges.</p>
+</div>
+<!-- Section 1: Badge Definitions -->
+<section class="space-y-md">
+<h3 class="font-headline-lg text-headline-lg border-b border-surface-container-highest pb-xs">Section 1: Badge Definitions</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Time Badge -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex flex-col items-center justify-center space-y-sm">
+<div class="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-500 text-3xl" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md">Time Badge</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Amber clock (#f59e0b) on light amber</p>
+</div>
+</div>
+<!-- Location Badge -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex flex-col items-center justify-center space-y-sm">
+<div class="w-16 h-16 rounded-2xl bg-teal-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-teal-500 text-3xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md">Location Badge</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Teal pin (#14b8a6) on light teal</p>
+</div>
+</div>
+<!-- Combined Badge -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex flex-col items-center justify-center space-y-sm">
+<div class="w-16 h-16 rounded-2xl flex overflow-hidden relative">
+<div class="w-1/2 h-full bg-amber-100 flex items-center justify-center pl-2">
+<span class="material-symbols-outlined text-amber-500 text-2xl absolute left-2" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div class="w-1/2 h-full bg-teal-100 flex items-center justify-center pr-2">
+<span class="material-symbols-outlined text-teal-500 text-2xl absolute right-2" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md">Combined Badge</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Split background, both icons</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Component Integration -->
+<section class="space-y-md">
+<h3 class="font-headline-lg text-headline-lg border-b border-surface-container-highest pb-xs">Section 2: Component Integration</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Task Card Integration -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_2px_8px_rgba(26,26,46,0.05)] space-y-md">
+<h4 class="font-headline-md text-headline-md text-on-surface-variant">Task Card Example</h4>
+<div class="bg-surface rounded-lg p-md border border-surface-container-highest flex items-start gap-md">
+<div class="w-10 h-10 rounded-xl bg-amber-100 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-500 text-xl" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<div class="flex-grow">
+<h5 class="font-headline-md text-headline-md">Review Q3 Specs</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">Due at 3:00 PM today</p>
+</div>
+</div>
+<div class="bg-surface rounded-lg p-md border border-surface-container-highest flex items-start gap-md">
+<div class="w-10 h-10 rounded-xl bg-teal-100 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-teal-500 text-xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="flex-grow">
+<h5 class="font-headline-md text-headline-md">Pick up Groceries</h5>
+<p class="font-body-md text-body-md text-on-surface-variant">When near Whole Foods</p>
+</div>
+</div>
+</div>
+<!-- Map & Calendar Integration -->
+<div class="space-y-md">
+<!-- Map Pin -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex items-center justify-between">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface-variant">Map Pin Example</h4>
+<p class="font-body-md text-body-md text-outline mt-1">Badge inside pin head</p>
+</div>
+<div class="relative w-16 h-20 flex flex-col items-center">
+<div class="w-12 h-12 bg-white rounded-full shadow-md border-2 border-teal-500 flex items-center justify-center z-10">
+<div class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-teal-500 text-lg" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+<div class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[14px] border-l-transparent border-r-transparent border-t-teal-500 -mt-2"></div>
+</div>
+</div>
+<!-- Calendar Dot -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_2px_8px_rgba(26,26,46,0.05)] flex items-center justify-between">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface-variant">Calendar Cell</h4>
+<p class="font-body-md text-body-md text-outline mt-1">Indicators below date</p>
+</div>
+<div class="w-16 h-16 border border-surface-container-highest rounded-lg flex flex-col items-center justify-center bg-surface pt-1">
+<span class="font-headline-md text-headline-md mb-1">14</span>
+<div class="flex gap-1">
+<div class="w-2 h-2 rounded-full bg-amber-500"></div>
+<div class="w-2 h-2 rounded-full bg-teal-500"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Hidden on md, visible on small screens) -->
+<nav class="md:hidden bg-surface-container-lowest dark:bg-surface-container-lowest shadow-[0_-2px_8px_rgba(26,26,46,0.05)] shadow-lg fixed bottom-0 w-full z-50 rounded-t-xl pb-8 px-4 py-3">
+<ul class="flex justify-around items-center w-full">
+<li class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 duration-200 cursor-pointer">
+<span class="material-symbols-outlined text-2xl" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</li>
+<li class="flex flex-col items-center justify-center text-outline active:scale-90 duration-200 cursor-pointer hover:bg-surface-container-low rounded-xl transition-all p-1">
+<span class="material-symbols-outlined text-2xl" data-icon="search" style="font-variation-settings: 'FILL' 0;">search</span>
+<span class="font-label-sm text-label-sm mt-1">Search</span>
+</li>
+<li class="flex flex-col items-center justify-center text-outline active:scale-90 duration-200 cursor-pointer hover:bg-surface-container-low rounded-xl transition-all p-1">
+<span class="material-symbols-outlined text-2xl" data-icon="add_circle" style="font-variation-settings: 'FILL' 0;">add_circle</span>
+<span class="font-label-sm text-label-sm mt-1">Create</span>
+</li>
+<li class="flex flex-col items-center justify-center text-outline active:scale-90 duration-200 cursor-pointer hover:bg-surface-container-low rounded-xl transition-all p-1">
+<span class="material-symbols-outlined text-2xl" data-icon="map" style="font-variation-settings: 'FILL' 0;">map</span>
+<span class="font-label-sm text-label-sm mt-1">Map</span>
+</li>
+<li class="flex flex-col items-center justify-center text-outline active:scale-90 duration-200 cursor-pointer hover:bg-surface-container-low rounded-xl transition-all p-1">
+<span class="material-symbols-outlined text-2xl" data-icon="calendar_today" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="font-label-sm text-label-sm mt-1">Calendar</span>
+</li>
+</ul>
+</nav>
+</body></html>

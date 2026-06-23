@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Task Detail - Buy Milk</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#fcf8ff",
+                        "on-background": "#1a1a2e",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e8e5ff",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-dim": "#dad7f3",
+                        "primary-container": "#4f46e5",
+                        "surface-bright": "#fcf8ff",
+                        "on-surface": "#1a1a2e",
+                        "surface-variant": "#e2e0fc",
+                        "primary": "#3525cd",
+                        "surface-container": "#efecff",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f2efff",
+                        "surface-tint": "#4d44e3",
+                        "surface": "#fcf8ff",
+                        "outline-variant": "#c7c4d8",
+                        "surface-container-low": "#f5f2ff",
+                        "on-surface-variant": "#464555",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f2e43",
+                        "on-primary-container": "#dad7ff",
+                        "outline": "#777587",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e2e0fc",
+                        "primary-fixed": "#e2dfff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "16px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "base": "4px",
+                        "md": "16px",
+                        "stack-gap": "12px",
+                        "lg": "24px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shadow-level-1 {
+            box-shadow: 0 2px 8px rgba(26, 26, 46, 0.05);
+        }
+        .shadow-level-2 {
+            box-shadow: 0 10px 20px rgba(26, 26, 46, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#F7F8FC] text-on-surface font-body-md min-h-screen flex flex-col antialiased">
+<!-- Top App Bar -->
+<header class="w-full sticky top-0 z-50 bg-[#F7F8FC] shadow-sm flex items-center justify-between px-md py-sm">
+<button aria-label="Back" class="p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold tracking-tight">Task Details</h1>
+<button aria-label="More options" class="p-2 -mr-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow px-container-padding py-lg flex flex-col gap-lg pb-32">
+<!-- Title & Priority -->
+<div class="flex flex-col gap-base">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Medium Priority</span>
+</div>
+<h2 class="font-display text-display text-on-surface">Buy Milk</h2>
+</div>
+<!-- Reminder Details Section -->
+<section class="bg-surface shadow-level-1 rounded-xl p-md flex flex-col gap-md">
+<!-- Time -->
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-0.5">Time</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">July 03, 2024, 06:30 PM</p>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-[1px] w-full bg-gray-100 ml-14"></div>
+<!-- Location -->
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 shrink-0">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-0.5">Location</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">Navami, Moodbidri</p>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-[1px] w-full bg-gray-100 ml-14"></div>
+<!-- Trigger -->
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[20px]">radio_button_checked</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-0.5">Trigger</p>
+<p class="font-body-lg text-body-lg text-on-surface font-medium">150m radius</p>
+</div>
+</div>
+</section>
+<!-- Notes Section -->
+<section class="bg-surface shadow-level-1 rounded-xl p-md relative">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface">Notes</h3>
+<div class="flex gap-xs">
+<button aria-label="Copy notes" class="p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+<button aria-label="Share notes" class="p-1.5 rounded-lg hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface leading-relaxed">
+                Pick up 2 liters of full cream milk. Check for expiry date.
+            </p>
+</section>
+<!-- Metadata -->
+<section class="flex flex-col gap-1 px-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant/70">Created: July 01, 2024, 10:00 AM</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant/70">Modified: July 02, 2024, 04:15 PM</p>
+</section>
+<!-- Spacer to push actions to bottom -->
+<div class="flex-grow"></div>
+<!-- Bottom Actions -->
+<section class="flex flex-col gap-sm mt-lg">
+<button class="w-full bg-gradient-to-r from-[#6366F1] to-[#4F46E5] text-white font-headline-md text-headline-md py-3.5 rounded-xl shadow-md hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit</span>
+                Edit Task
+            </button>
+<button class="w-full border-2 border-error text-error font-headline-md text-headline-md py-3 rounded-xl hover:bg-error/5 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">delete</span>
+                Delete Task
+            </button>
+</section>
+</main>
+<!-- Undo Toast Overlay -->
+<div class="fixed bottom-24 left-0 right-0 px-container-padding z-40 pointer-events-none flex justify-center">
+<div class="bg-inverse-surface text-inverse-on-surface rounded-xl px-md py-3 shadow-level-2 flex items-center justify-between w-full max-w-sm pointer-events-auto">
+<span class="font-body-md text-body-md">Task deleted</span>
+<button class="font-headline-md text-headline-md text-inverse-primary hover:text-white transition-colors uppercase tracking-wide">Undo</button>
+</div>
+</div>
+<!-- Bottom Navigation Layer -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-container-padding pb-xl pt-xs bg-surface shadow-[0_-2px_10px_rgba(26,26,46,0.05)] rounded-t-xl md:hidden">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-2 w-16 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<!-- Search -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 px-2 py-1 w-16 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1">search</span>
+<span class="font-label-sm text-label-sm">Search</span>
+</button>
+<!-- Add (Center FAB style integration in Nav) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 px-2 py-1 w-16 -mt-6 active:scale-90 transition-all duration-200">
+<div class="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
+<span class="material-symbols-outlined">add</span>
+</div>
+</button>
+<!-- Map -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 px-2 py-1 w-16 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1">map</span>
+<span class="font-label-sm text-label-sm">Map</span>
+</button>
+<!-- Calendar -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 px-2 py-1 w-16 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1">agender</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+</nav>
+<script>
+        // Simple script to dismiss toast on undo click for demonstration
+        document.querySelector('.fixed.bottom-24 button').addEventListener('click', function(e) {
+            e.target.closest('.fixed.bottom-24').style.display = 'none';
+        });
+    </script>
+</body></html>

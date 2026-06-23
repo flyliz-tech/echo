@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Echo Task Manager - Interaction States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-secondary-fixed-variant": "#653e00",
+                            "surface-bright": "#fcf8ff",
+                            "primary": "#3525cd",
+                            "on-secondary-container": "#684000",
+                            "on-primary-fixed": "#0f0069",
+                            "primary-fixed": "#e2dfff",
+                            "on-surface": "#1a1a2e",
+                            "on-primary-container": "#dad7ff",
+                            "on-error-container": "#93000a",
+                            "surface-container-low": "#f5f2ff",
+                            "surface-variant": "#e2e0fc",
+                            "surface": "#fcf8ff",
+                            "on-background": "#1a1a2e",
+                            "on-primary-fixed-variant": "#3323cc",
+                            "on-secondary": "#ffffff",
+                            "on-secondary-fixed": "#2a1700",
+                            "tertiary-fixed": "#71f8e4",
+                            "tertiary-fixed-dim": "#4fdbc8",
+                            "surface-tint": "#4d44e3",
+                            "error": "#ba1a1a",
+                            "on-primary": "#ffffff",
+                            "outline-variant": "#c7c4d8",
+                            "on-surface-variant": "#464555",
+                            "on-tertiary": "#ffffff",
+                            "on-tertiary-container": "#69f1de",
+                            "surface-dim": "#dad7f3",
+                            "secondary-fixed": "#ffddb8",
+                            "secondary-container": "#fea619",
+                            "background": "#fcf8ff",
+                            "tertiary": "#00534a",
+                            "secondary": "#855300",
+                            "primary-fixed-dim": "#c3c0ff",
+                            "error-container": "#ffdad6",
+                            "surface-container": "#efecff",
+                            "surface-container-highest": "#e2e0fc",
+                            "on-tertiary-fixed": "#00201c",
+                            "on-error": "#ffffff",
+                            "outline": "#777587",
+                            "inverse-surface": "#2f2e43",
+                            "secondary-fixed-dim": "#ffb95f",
+                            "inverse-primary": "#c3c0ff",
+                            "inverse-on-surface": "#f2efff",
+                            "tertiary-container": "#006d62",
+                            "surface-container-high": "#e8e5ff",
+                            "primary-container": "#4f46e5",
+                            "on-tertiary-fixed-variant": "#005048",
+                            "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "xs": "8px",
+                            "sm": "12px",
+                            "container-padding": "16px",
+                            "lg": "24px",
+                            "stack-gap": "12px",
+                            "base": "4px",
+                            "xl": "32px",
+                            "md": "16px"
+                    },
+                    "fontFamily": {
+                            "headline-md": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "label-sm": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display": ["Inter"],
+                            "headline-lg-mobile": ["Inter"],
+                            "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                            "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                            "headline-lg": ["24px", {"lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "display": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "headline-lg-mobile": ["20px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Shadows */
+        .shadow-level-1 { box-shadow: 0 2px 8px rgba(26, 26, 46, 0.05); }
+        .shadow-level-2 { box-shadow: 0 10px 20px rgba(26, 26, 46, 0.08); }
+        .shadow-pressed { box-shadow: 0 1px 4px rgba(26, 26, 46, 0.1) inset; }
+        
+        /* Animations */
+        @keyframes pulse-skeleton {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .animate-pulse-skeleton { animation: pulse-skeleton 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-xl">
+<!-- Header -->
+<header class="w-full px-container-padding py-lg bg-surface flex items-center justify-between shadow-level-1 sticky top-0 z-50">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Echo</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Interaction States Spec</p>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-container-padding py-xl space-y-xl">
+<!-- Section 1: Checkbox Completion -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Section 1: Checkbox Completion Sequence</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Idle -->
+<div class="bg-surface rounded-xl p-md flex flex-col items-center gap-sm shadow-level-1">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">1. Idle</span>
+<div class="w-12 h-12 rounded-full border-2 border-outline flex items-center justify-center bg-surface"></div>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Standard outline stroke.</p>
+</div>
+<!-- Mid-Animation -->
+<div class="bg-surface rounded-xl p-md flex flex-col items-center gap-sm shadow-level-1">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">2. Mid-Animation</span>
+<div class="w-12 h-12 rounded-full border-2 border-tertiary-container flex items-center justify-center bg-tertiary-container/30 transform scale-110 transition-transform"></div>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Spring scale up, subtle green fill.</p>
+</div>
+<!-- Complete -->
+<div class="bg-surface rounded-xl p-md flex flex-col items-center gap-sm shadow-level-1">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">3. Complete</span>
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center transform scale-100 transition-transform">
+<span class="material-symbols-outlined text-on-tertiary">check</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-center">Solid green fill, checkmark, normal scale.</p>
+</div>
+</div>
+</section>
+<!-- Section 2: Card Press State -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Section 2: Card Press State</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Normal -->
+<div class="space-y-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block text-center">Normal State (Elevation Level 1)</span>
+<div class="bg-surface rounded-xl p-md flex items-center justify-between shadow-level-1 border border-transparent transition-all">
+<div class="flex items-center gap-md">
+<div class="w-6 h-6 rounded-full border-2 border-outline"></div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Review Q3 Deck</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Today, 2:00 PM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</div>
+</div>
+<!-- Pressed -->
+<div class="space-y-sm">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block text-center">Pressed State (Scale 0.98, Inner Shadow)</span>
+<div class="bg-surface-container-low rounded-xl p-md flex items-center justify-between shadow-pressed transform scale-[0.98] transition-all">
+<div class="flex items-center gap-md">
+<div class="w-6 h-6 rounded-full border-2 border-outline"></div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Review Q3 Deck</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Today, 2:00 PM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Delete Undo Toast -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Section 3: Delete Undo Toast</h2>
+<div class="bg-surface rounded-xl p-xl shadow-level-1 flex items-center justify-center relative overflow-hidden h-64 border border-surface-variant">
+<!-- Decorative background for context -->
+<div class="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+<!-- Toast Component -->
+<div class="bg-inverse-surface rounded-lg px-md py-sm flex items-center justify-between w-full max-w-sm shadow-level-2 z-10 absolute bottom-lg">
+<span class="font-body-md text-body-md text-inverse-on-surface">Task deleted</span>
+<button class="font-label-sm text-label-sm text-secondary-container hover:text-secondary-fixed-dim transition-colors uppercase tracking-wide">Undo</button>
+</div>
+</div>
+</section>
+<!-- Section 4: Skeleton Loaders -->
+<section class="space-y-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Section 4: Skeleton Loaders</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Search Skeleton -->
+<div class="bg-surface rounded-xl p-md shadow-level-1 space-y-md border border-surface-variant">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block mb-sm">List View Skeleton</span>
+<!-- Search Bar Skeleton -->
+<div class="w-full h-12 rounded-full bg-surface-container border border-surface-variant flex items-center px-md animate-pulse-skeleton">
+<div class="w-6 h-6 rounded-full bg-surface-variant mr-sm"></div>
+<div class="w-1/3 h-4 rounded bg-surface-variant"></div>
+</div>
+<!-- List Items Skeleton -->
+<div class="space-y-sm mt-md">
+<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-lg animate-pulse-skeleton">
+<div class="w-6 h-6 rounded-full bg-surface-variant shrink-0"></div>
+<div class="w-full space-y-xs">
+<div class="w-3/4 h-4 rounded bg-surface-variant"></div>
+<div class="w-1/2 h-3 rounded bg-surface-container-highest"></div>
+</div>
+</div>
+<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-lg animate-pulse-skeleton" style="animation-delay: 150ms;">
+<div class="w-6 h-6 rounded-full bg-surface-variant shrink-0"></div>
+<div class="w-full space-y-xs">
+<div class="w-2/3 h-4 rounded bg-surface-variant"></div>
+<div class="w-1/3 h-3 rounded bg-surface-container-highest"></div>
+</div>
+</div>
+<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-lg animate-pulse-skeleton" style="animation-delay: 300ms;">
+<div class="w-6 h-6 rounded-full bg-surface-variant shrink-0"></div>
+<div class="w-full space-y-xs">
+<div class="w-4/5 h-4 rounded bg-surface-variant"></div>
+<div class="w-1/4 h-3 rounded bg-surface-container-highest"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Skeleton -->
+<div class="bg-surface rounded-xl p-md shadow-level-1 border border-surface-variant flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block mb-sm">Map View Skeleton</span>
+<div class="relative w-full flex-grow rounded-lg bg-surface-container animate-pulse-skeleton overflow-hidden min-h-[250px]">
+<!-- Abstract Map Pattern overlay -->
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-surface-variant to-surface-container"></div>
+<!-- Map Pin Skeleton -->
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-variant border-4 border-surface flex items-center justify-center shadow-sm">
+<div class="w-3 h-3 rounded-full bg-surface"></div>
+</div>
+<!-- Pin shadow -->
+<div class="w-6 h-2 rounded-[100%] bg-surface-variant/50 mt-1 blur-[1px]"></div>
+</div>
+<!-- Floating Controls Skeleton -->
+<div class="absolute bottom-md right-md flex flex-col gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface shadow-sm flex items-center justify-center">
+<div class="w-5 h-5 rounded bg-surface-variant"></div>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface shadow-sm flex items-center justify-center">
+<div class="w-5 h-5 rounded bg-surface-variant"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

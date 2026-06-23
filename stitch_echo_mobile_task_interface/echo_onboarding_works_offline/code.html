@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Echo - Onboarding Step 3</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#653e00",
+                        "surface-container": "#efecff",
+                        "primary-fixed": "#e2dfff",
+                        "secondary-container": "#fea619",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "on-primary-fixed": "#0f0069",
+                        "on-surface": "#1a1a2e",
+                        "on-tertiary-fixed": "#00201c",
+                        "surface-container-highest": "#e2e0fc",
+                        "tertiary-fixed-dim": "#4fdbc8",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#777587",
+                        "surface-variant": "#e2e0fc",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#71f8e4",
+                        "on-surface-variant": "#464555",
+                        "surface-tint": "#4d44e3",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e8e5ff",
+                        "on-secondary-container": "#684000",
+                        "outline-variant": "#c7c4d8",
+                        "primary": "#3525cd",
+                        "tertiary-container": "#006d62",
+                        "tertiary": "#00534a",
+                        "surface-container-low": "#f5f2ff",
+                        "inverse-on-surface": "#f2efff",
+                        "inverse-primary": "#c3c0ff",
+                        "on-primary-container": "#dad7ff",
+                        "inverse-surface": "#2f2e43",
+                        "surface": "#fcf8ff",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "secondary": "#855300",
+                        "on-tertiary-container": "#69f1de",
+                        "surface-dim": "#dad7f3",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fcf8ff",
+                        "surface-bright": "#fcf8ff",
+                        "on-tertiary-fixed-variant": "#005048",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "on-secondary-fixed": "#2a1700",
+                        "on-background": "#1a1a2e",
+                        "secondary-fixed": "#ffddb8",
+                        "on-primary-fixed-variant": "#3323cc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "stack-gap": "12px",
+                        "container-padding": "16px",
+                        "base": "4px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xs": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen w-full overflow-hidden flex flex-col antialiased">
+<!-- Top Action Area (Skip) -->
+<header class="w-full flex justify-end p-container-padding pt-6 relative z-10">
+<button class="font-label-sm text-label-sm text-primary hover:opacity-80 transition-opacity active:scale-95 py-2 px-4">
+            Skip
+        </button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding pb-8">
+<!-- 3D Illustration Placeholder -->
+<div class="w-full max-w-sm flex justify-center mb-xl">
+<img alt="Offline capability 3D illustration" class="w-64 h-64 object-contain animate-float drop-shadow-xl" src="https://lh3.googleusercontent.com/aida/AP1WRLtax95Iz76w8ki5K9Ic4BnAeOWfJL9yVutHnyIJkhyywHZcWLpU3b4h96IPWCR0P_hW5rQDbgMzLXDZAxB4WQZNPXuCe9NQpY4iiuUcBFLyUz-3u4b2H8-DnINksePQqD2otkkIFhYvnGGW_1-zICR4w9Fbop84VxjEo74BkSGH75PEszxJoMj3xLwWwy2f-HJSoe8hf6Gj6UCkL1r-5FbdG7ybykErWDEE9WvxF3Pjhp5kJCQvrcfTWA"/>
+</div>
+<!-- Typography Cluster -->
+<div class="text-center max-w-md mx-auto space-y-sm px-4">
+<h1 class="font-display text-display text-on-surface tracking-tight">Works offline</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                Your data stays on your device. No account required, no tracking, just your tasks where you need them.
+            </p>
+</div>
+</main>
+<!-- Bottom Navigation / Action Area -->
+<footer class="w-full px-container-padding pb-10 flex flex-col items-center gap-xl bg-gradient-to-t from-background to-transparent relative z-10">
+<!-- Progress Indicators -->
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant/40 transition-colors"></div>
+<div class="w-2 h-2 rounded-full bg-outline-variant/40 transition-colors"></div>
+<div class="w-6 h-2 rounded-full bg-primary shadow-sm transition-all duration-300"></div>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full max-w-sm py-4 rounded-full bg-primary text-on-primary font-headline-md text-headline-md shadow-[0_8px_20px_-6px_rgba(53,37,205,0.4)] hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+            Get Started
+            <span class="material-symbols-outlined" style="font-size: 20px;">arrow_forward</span>
+</button>
+</footer>
+</body></html>
